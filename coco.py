@@ -95,7 +95,7 @@ def annotate(im, do_display=True, do_save=True):
     im_dict['category'] = category
 
     if do_display:
-        display()
+        display(im_dict)
 
     if do_save:
         save(im_dict)
