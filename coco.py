@@ -14,12 +14,14 @@ def mask_to_annotation(mask):
     for contour in contours:
         area = cv2.contourArea(contour)
         if area > 1000:  # Example area threshold
-            sorted_contours.append(contour)
+            # Approximate the contour to reduce the number of points
+            epsilon = 0.002 * cv2.arcLength(contour, True)  # Adjust the epsilon value as needed
+            approx_contour = cv2.approxPolyDP(contour, epsilon, True)
+            sorted_contours.append(approx_contour)
 
     sorted_contours = sorted(sorted_contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
 
     return sorted_contours
-
 
 
 def display(im_dict, annotation_color):
