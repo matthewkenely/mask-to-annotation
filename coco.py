@@ -80,6 +80,8 @@ def contours_to_coco(contours):
 
         annotation_id += 1
 
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
     return coco_data
 
 
@@ -142,7 +144,7 @@ def save(contours, id_):
         json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, display=True, save=True):
+def annotate(im, do_display=True, do_save=True):
     id_, name, image = im
 
     im_dict = {}
@@ -152,8 +154,8 @@ def annotate(im, display=True, save=True):
     im_dict['height'] = image.shape[0]
     im_dict['contours'] = mask_to_annotation(image)
 
-    if display:
+    if do_display:
         display()
 
-    if save:
+    if do_save:
         save(im_dict, id_)
