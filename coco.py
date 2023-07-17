@@ -29,13 +29,17 @@ def mask_to_annotation(mask):
 
 
 def display(im_dict):
+    x = im_dict['contours'][:, 0, 0]
+    y = im_dict['contours'][:, 0, 1]
+    
     # Display original mask on the left and annotation on the right
     fig, (ax1, ax2) = plt.subplots(1, 2)
     ax1.imshow(im_dict['image'], interpolation='nearest')
     ax1.axis('off')
-    ax2.imshow(im_dict['contours'], interpolation='nearest')
+    ax2.plot(x, y, linewidth=2)
     ax2.axis('off')
     plt.show()
+
 
 def save(im_dict):
     coco_data = {
