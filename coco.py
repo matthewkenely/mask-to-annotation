@@ -5,20 +5,6 @@ import matplotlib.pyplot as plt
 import os
 
 
-project_name = 'COTS Dataset'
-category = 'directory'
-
-
-# Load images
-images = {}
-for x in os.listdir('masks'):
-    images[x] = cv2.imread('masks/' + x)
-    images[x] = images[x][:, :, ::-1]
-    plt.imshow(images[x], interpolation='nearest')
-    plt.axis('off')
-    plt.show()
-
-
 def mask_to_annotation(mask):
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
@@ -36,7 +22,7 @@ def mask_to_annotation(mask):
 
 
 
-def display(im_dict):
+def display(im_dict, annotation_color):
     for i in range(len(im_dict['contours'])):
         x = im_dict['contours'][i][:, 0, 0]
         y = im_dict['contours'][i][:, 0, 1]
@@ -53,7 +39,7 @@ def display(im_dict):
     plt.subplot(122)
     plt.title('Annotation')
     plt.imshow(im_dict['image'], interpolation='nearest')
-    plt.plot(x, y, 'r', linewidth=2)
+    plt.plot(x, y, annotation_color, linewidth=2)
     plt.axis('off')
     plt.show()
 
@@ -98,14 +84,22 @@ def save(im_dict):
             'bbox': cv2.boundingRect(contour),
             'area': cv2.contourArea(contour)
         })
+        
+    
+        if not os.path.exists(im_dict['directory']):
+            os.makedirs(im_dict['directory'])
 
-    with open('./output/' + str(im_dict['id']) + '_' + str(im_dict['file_name']) + '.json', 'w') as f:
-        json.dump(coco_data, f, indent=4)
+        file_path = os.path.join(im_dict['directory'], str(im_dict['id']) + '_' + str(im_dict['file_name']) + '.json')
+
+        with open(file_path, 'w') as f:
+            json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True):
-    id_, name, image, project_name, category = im
-
+def annotate(im, do_display=True, do_save=True, annotation_color='g'):
+    id_, name, image, project_name, category, directory = im
+    
+    print("Annotating image: ",name)
+    
     im_dict = {}
     im_dict['id'] = id_
     im_dict['file_name'] = name
@@ -115,9 +109,11 @@ def annotate(im, do_display=True, do_save=True):
     im_dict['contours'] = mask_to_annotation(image)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
+    im_dict['directory']=directory
 
     if do_display:
-        display(im_dict)
+        display(im_dict, annotation_color)
 
     if do_save:
         save(im_dict)
+        print('\033[92m',"Succesfully saved image: ",name,'\033[0m')
