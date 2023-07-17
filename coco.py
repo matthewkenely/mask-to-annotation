@@ -28,124 +28,48 @@ def mask_to_annotation(mask):
     return sorted_contours
 
 
-def contours_to_coco(contours):
-    coco_data = {
-        'info': {
-            'description': project_name
-        },
-        'images': [],
-        'annotations': [],
-        'categories': []
-    }
-
-    annotation_id = 1
-
-    for image_id, image_descriptor in contours.items():
-        contour_list = image_descriptor['contours']
-
-        # Create image entry
-        image_entry = {
-            'id': image_id,
-            'width': image_descriptor['width'],
-            'height': image_descriptor['height'],
-            'file_name': image_descriptor['file_name']
-        }
-
-        # Create annotation entry
-        for contour in contour_list:
-            contour = np.array(contour, dtype=np.float32)
-
-            # Check if the contour has enough points
-            if contour.shape[0] < 3:
-                continue
-
-            # Create annotation entry
-            annotation_entry = {
-                'id': annotation_id,
-                'image_id': image_id,
-                'category_id': image_id,
-                'segmentation': contour.squeeze().tolist(),
-                'area': cv2.contourArea(contour),
-                'bbox': cv2.boundingRect(contour)
-            }
-
-        # Create categories entry
-#         category_entry = {
-#             'id': annotation_id,
-#             'name': bbox
-#         }
-
-        coco_data['images'].append(image_entry)
-        coco_data['annotations'].append(annotation_entry)
-
-        annotation_id += 1
-
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    return coco_data
-
-
 def display():
     pass
 
 
-def save(contours, id_):
+def save(im_dict):
     coco_data = {
         'info': {
-            'description': project_name
+            'description': im_dict['project_name']
         },
-        'images': [],
-        'annotations': [],
-        'categories': []
+        'images': [
+            {
+                'id': im_dict['id'],
+                'width': im_dict['width'],
+                'height': im_dict['height'],
+                'file_name': im_dict['file_name']
+            }
+        ],
+        'annotations': [
+            {
+                'id': im_dict['id'],
+                'iscrowd': 0,
+                'image_id': im_dict['id'],
+                'category_id': im_dict['id'],
+                'segmentation': im_dict['contours'],
+                'bbox': cv2.boundingRect(im_dict['contours']),
+                'area': cv2.contourArea(im_dict['contours'])
+            }
+        ],
+        'categories': [
+            {
+                'id': im_dict['id'],
+                'name': im_dict['category']
+            }
+        ]
     }
 
-    annotation_id = 1
-
-    for image_id, image_descriptor in contours.items():
-        contour_list = image_descriptor['contours']
-
-        # Create image entry
-        image_entry = {
-            'id': image_id,
-            'width': image_descriptor['width'],
-            'height': image_descriptor['height'],
-            'file_name': image_descriptor['file_name']
-        }
-
-        # Create annotation entry
-        for contour in contour_list:
-            contour = np.array(contour, dtype=np.float32)
-
-            # Check if the contour has enough points
-            if contour.shape[0] < 3:
-                continue
-
-            # Create annotation entry
-            annotation_entry = {
-                'image_id': image_id,
-                'category_id': image_id,
-                'segmentation': contour.squeeze().tolist(),
-                'area': cv2.contourArea(contour),
-                'bbox': cv2.boundingRect(contour)
-            }
-
-        # Create categories entry
-#         category_entry = {
-#             'id': annotation_id,
-#             'name': bbox
-#         }
-
-        coco_data['images'].append(image_entry)
-        coco_data['annotations'].append(annotation_entry)
-
-        annotation_id += 1
-
-    with open(id_ + '.json', 'w') as f:
+    with open(im_dict['id'] + '.json', 'w') as f:
         json.dump(coco_data, f, indent=4)
 
 
 def annotate(im, do_display=True, do_save=True):
-    id_, name, image = im
+    id_, name, image, project_name, category = im
 
     im_dict = {}
     im_dict['id'] = id_
@@ -153,9 +77,11 @@ def annotate(im, do_display=True, do_save=True):
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
     im_dict['contours'] = mask_to_annotation(image)
+    im_dict['project_name'] = project_name
+    im_dict['category'] = category
 
     if do_display:
         display()
 
     if do_save:
-        save(im_dict, id_)
+        save(im_dict)
