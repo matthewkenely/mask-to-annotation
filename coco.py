@@ -32,14 +32,14 @@ def display(im_dict, annotation_color):
     plt.rcParams["figure.figsize"] = (20, 10)
 
     plt.subplot(121)
-    plt.title('Original mask')
     plt.rcParams['axes.titlesize'] = 20
+    plt.title('Original mask')
     plt.imshow(im_dict['image'], interpolation='nearest')
     plt.axis('off')
 
     plt.subplot(122)
-    plt.title('Annotation')
     plt.rcParams['axes.titlesize'] = 20
+    plt.title('Annotation')
     plt.imshow(im_dict['image'], interpolation='nearest')
     plt.plot(x, y, annotation_color, linewidth=2)
     plt.axis('off')
@@ -91,7 +91,7 @@ def save(im_dict):
         if not os.path.exists(im_dict['directory']):
             os.makedirs(im_dict['directory'])
 
-        file_path = os.path.join(im_dict['directory'], str(im_dict['id']) + '_' + str(im_dict['file_name']) + '.json')
+        file_path = os.path.join("./"+im_dict['directory'], str(im_dict['id']) + '_' + str(im_dict['file_name']) + '.json')
 
         with open(file_path, 'w') as f:
             json.dump(coco_data, f, indent=4)
@@ -100,7 +100,7 @@ def save(im_dict):
 def annotate(im, do_display=True, do_save=True, annotation_color='g'):
     id_, name, image, project_name, category, directory = im
     
-    print("Annotating image: ",name)
+    print("\n Annotating image: ",name)
     
     im_dict = {}
     im_dict['id'] = id_
@@ -118,4 +118,5 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
 
     if do_save:
         save(im_dict)
-        print('\033[92m',"Succesfully saved image: ",name,'\033[0m')
+        print('\033[92m',"Succesfully saved image: ",name,'\033[0m\n\n')
+    print("-"*120)
