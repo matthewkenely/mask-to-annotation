@@ -34,19 +34,17 @@ def display(im_dict):
         y = im_dict['contours'][i][:, 0, 1]
 
     # Display original mask on the left and annotation on the right
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+    plt.figure()
+    plt.subplot(121)
+    plt.title('Original mask')
+    plt.imshow(im_dict['image'], interpolation='nearest')
+    plt.axis('off')
 
-    # make both subplots the same size
-    ax1.set_aspect('equal')
-    ax2.set_aspect('equal')
-
-    ax1.set_title('Original Mask')
-    ax2.set_title('Annotation')
-
-    ax1.imshow(im_dict['image'], interpolation='nearest')
-    ax1.axis('off')
-    ax2.plot(x, y, linewidth=2)
-    ax2.axis('off')
+    plt.subplot(122)
+    plt.title('Annotation')
+    # plt.imshow(im_dict['image'], interpolation='nearest')
+    plt.plot(x, y, 'r', linewidth=2)
+    plt.axis('off')
     plt.show()
 
 
