@@ -28,9 +28,14 @@ def mask_to_annotation(mask):
     return sorted_contours
 
 
-def display():
-    pass
-
+def display(im_dict):
+    # Display original mask on the left and annotation on the right
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.imshow(im_dict['image'], interpolation='nearest')
+    ax1.axis('off')
+    ax2.imshow(im_dict['contours'], interpolation='nearest')
+    ax2.axis('off')
+    plt.show()
 
 def save(im_dict):
     coco_data = {
