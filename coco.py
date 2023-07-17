@@ -91,7 +91,7 @@ def save(im_dict):
         if not os.path.exists(im_dict['directory']):
             os.makedirs(im_dict['directory'])
 
-        file_path = os.path.join("./"+im_dict['directory'], str(im_dict['id']) + '_' + str(im_dict['file_name']) + '.json')
+        file_path = os.path.join("./"+im_dict['directory'], str(im_dict['file_name']) + '.json')
 
         with open(file_path, 'w') as f:
             json.dump(coco_data, f, indent=4)
