@@ -73,7 +73,7 @@ def save(im_dict):
             'area': cv2.contourArea(contour)
         })
 
-    with open(im_dict['id'] + '.json', 'w') as f:
+    with open(str(im_dict['id']) + '_' + str(im_dict['file_name']) + '.json', 'w') as f:
         json.dump(coco_data, f, indent=4)
 
 
