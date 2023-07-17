@@ -21,11 +21,19 @@ for x in os.listdir('masks'):
 
 def mask_to_annotation(mask):
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-    contours, _ = cv2.findContours(
-        mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    sorted_contours = sorted(
-        contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
+    _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+    sorted_contours = []
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if area > 1000:  # Example area threshold
+            sorted_contours.append(contour)
+
+    sorted_contours = sorted(sorted_contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
+
     return sorted_contours
+
 
 
 def display(im_dict):
@@ -42,7 +50,7 @@ def display(im_dict):
 
     plt.subplot(122)
     plt.title('Annotation')
-    # plt.imshow(im_dict['image'], interpolation='nearest')
+    plt.imshow(im_dict['image'], interpolation='nearest')
     plt.plot(x, y, 'r', linewidth=2)
     plt.axis('off')
     plt.show()
