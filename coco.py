@@ -42,7 +42,9 @@ def display(im_dict):
         y = im_dict['contours'][i][:, 0, 1]
 
     # Display original mask on the left and annotation on the right
-    plt.figure()
+    # increase size
+    plt.rcParams["figure.figsize"] = (20, 10)
+
     plt.subplot(121)
     plt.title('Original mask')
     plt.imshow(im_dict['image'], interpolation='nearest')
