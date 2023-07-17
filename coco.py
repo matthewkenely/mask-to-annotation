@@ -68,7 +68,7 @@ def save(im_dict):
             'iscrowd': 0,
             'image_id': im_dict['id'],
             'category_id': im_dict['id'],
-            'segmentation': contour.tolist().squeeze().tolist(),
+            'segmentation': contour.squeeze().tolist(),
             'bbox': cv2.boundingRect(contour),
             'area': cv2.contourArea(contour)
         })
