@@ -29,9 +29,9 @@ def mask_to_annotation(mask):
 
 
 def display(im_dict):
-    x = im_dict['contours'][:, 0, 0]
-    y = im_dict['contours'][:, 0, 1]
-    
+    x = im_dict['contours'][0][:, 0, 0]
+    y = im_dict['contours'][0][:, 0, 1]
+
     # Display original mask on the left and annotation on the right
     fig, (ax1, ax2) = plt.subplots(1, 2)
     ax1.imshow(im_dict['image'], interpolation='nearest')
