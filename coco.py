@@ -33,11 +33,13 @@ def display(im_dict, annotation_color):
 
     plt.subplot(121)
     plt.title('Original mask')
+    plt.rcParams['axes.titlesize'] = 20
     plt.imshow(im_dict['image'], interpolation='nearest')
     plt.axis('off')
 
     plt.subplot(122)
     plt.title('Annotation')
+    plt.rcParams['axes.titlesize'] = 20
     plt.imshow(im_dict['image'], interpolation='nearest')
     plt.plot(x, y, annotation_color, linewidth=2)
     plt.axis('off')
