@@ -46,15 +46,7 @@ def save(im_dict):
             }
         ],
         'annotations': [
-            {
-                'id': im_dict['id'],
-                'iscrowd': 0,
-                'image_id': im_dict['id'],
-                'category_id': im_dict['id'],
-                'segmentation': im_dict['contours'],
-                'bbox': cv2.boundingRect(im_dict['contours']),
-                'area': cv2.contourArea(im_dict['contours'])
-            }
+            # Added later
         ],
         'categories': [
             {
@@ -63,6 +55,23 @@ def save(im_dict):
             }
         ]
     }
+
+    for contour in im_dict['contours']:
+        contour = np.array(contour, dtype=np.float32)
+
+        # Check if the contour has enough points
+        if contour.shape[0] < 3:
+            continue
+
+        coco_data['annotations'].append({
+            'id': im_dict['id'],
+            'iscrowd': 0,
+            'image_id': im_dict['id'],
+            'category_id': im_dict['id'],
+            'segmentation': contour.tolist(),
+            'bbox': cv2.boundingRect(contour),
+            'area': cv2.contourArea(contour)
+        })
 
     with open(im_dict['id'] + '.json', 'w') as f:
         json.dump(coco_data, f, indent=4)
