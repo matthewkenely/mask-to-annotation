@@ -5,155 +5,94 @@ import matplotlib.pyplot as plt
 import os
 
 
-project_name = 'COTS Dataset'
-category = 'directory'
+def mask_to_annotation(mask):
+    mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+    _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(
+        mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    bounding_boxes = []
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        current_box = (x, y, w, h)
+        is_nested = False
+
+        # Check if the current bounding box is nested inside another bounding box
+        # If yes, ignore it
+        for box in bounding_boxes:
+            if box[0] <= x and box[1] <= y and (box[0] + box[2]) >= (x + w) and (box[1] + box[3]) >= (y + h):
+                is_nested = True
+                break
+
+        if not is_nested:
+            bounding_boxes.append(current_box)
+
+    # Sort bounding boxes based on area in descending order
+    bounding_boxes = sorted(
+        bounding_boxes, key=lambda box: box[2] * box[3], reverse=True)
+
+    # Take the first two non-nested bounding boxes
+    bounding_boxes = bounding_boxes[:2]
+
+    return bounding_boxes
 
 
-# Load images
-images = {}
-for x in os.listdir('masks'):
-    images[x] = cv2.imread('masks/' + x)
-    images[x] = images[x][:, :, ::-1]
-    plt.imshow(images[x], interpolation='nearest')
+def display(im_dict, annotation_color):
+    # Display bounding boxes on the image
+    image_with_bounding_box = im_dict['image'].copy()
+    for contour in im_dict['contours']:
+        x, y, w, h = contour
+        cv2.rectangle(image_with_bounding_box, (x, y),
+                      (x+w, y+h), annotation_color, 8)
+
+    # Display original mask on the left and annotation on the right
+    # increase size
+    plt.rcParams["figure.figsize"] = (20, 10)
+
+    plt.subplot(121)
+    plt.rcParams['axes.titlesize'] = 20
+    plt.title('Original mask')
+    plt.imshow(im_dict['image'], interpolation='nearest')
+    plt.axis('off')
+
+    plt.subplot(122)
+    plt.rcParams['axes.titlesize'] = 20
+    plt.title('Annotation')
+    plt.imshow(image_with_bounding_box, interpolation='nearest')
     plt.axis('off')
     plt.show()
 
 
-def mask_to_annotation(mask):
-    mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-    contours, _ = cv2.findContours(
-        mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    sorted_contours = sorted(
-        contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
-    return sorted_contours
+def save(im_dict):
+    if not os.path.exists(im_dict['directory']):
+        os.makedirs(im_dict['directory'])
+
+    file_path = os.path.join(
+        "./"+im_dict['directory'], str(im_dict['file_name']) + '.txt')
+
+    with open(file_path, 'w') as f:
+        for count, contour in enumerate(im_dict['contours']):
+            x, y, w, h = contour
+            f.write(str(count)+" " + str(x) + " " +
+                    str(y) + " " + str(w) + " " + str(h)+"\n")
+        f.close()
 
 
-def contours_to_coco(contours):
-    coco_data = {
-        'info': {
-            'description': project_name
-        },
-        'images': [],
-        'annotations': [],
-        'categories': []
-    }
+def annotate(im, do_display=True, do_save=True, annotation_color='g'):
+    id_, name, image, project_name, category, directory = im
 
-    annotation_id = 1
-
-    for image_id, image_descriptor in contours.items():
-        contour_list = image_descriptor['contours']
-
-        # Create image entry
-        image_entry = {
-            'id': image_id,
-            'width': image_descriptor['width'],
-            'height': image_descriptor['height'],
-            'file_name': image_descriptor['file_name']
-        }
-
-        # Create annotation entry
-        for contour in contour_list:
-            contour = np.array(contour, dtype=np.float32)
-
-            # Check if the contour has enough points
-            if contour.shape[0] < 3:
-                continue
-
-            # Create annotation entry
-            annotation_entry = {
-                'id': annotation_id,
-                'image_id': image_id,
-                'category_id': image_id,
-                'segmentation': contour.squeeze().tolist(),
-                'area': cv2.contourArea(contour),
-                'bbox': cv2.boundingRect(contour)
-            }
-
-        # Create categories entry
-#         category_entry = {
-#             'id': annotation_id,
-#             'name': bbox
-#         }
-
-        coco_data['images'].append(image_entry)
-        coco_data['annotations'].append(annotation_entry)
-
-        annotation_id += 1
-
-    return coco_data
-
-
-def display():
-    pass
-
-
-def save(contours, id_):
-    coco_data = {
-        'info': {
-            'description': project_name
-        },
-        'images': [],
-        'annotations': [],
-        'categories': []
-    }
-
-    annotation_id = 1
-
-    for image_id, image_descriptor in contours.items():
-        contour_list = image_descriptor['contours']
-
-        # Create image entry
-        image_entry = {
-            'id': image_id,
-            'width': image_descriptor['width'],
-            'height': image_descriptor['height'],
-            'file_name': image_descriptor['file_name']
-        }
-
-        # Create annotation entry
-        for contour in contour_list:
-            contour = np.array(contour, dtype=np.float32)
-
-            # Check if the contour has enough points
-            if contour.shape[0] < 3:
-                continue
-
-            # Create annotation entry
-            annotation_entry = {
-                'image_id': image_id,
-                'category_id': image_id,
-                'segmentation': contour.squeeze().tolist(),
-                'area': cv2.contourArea(contour),
-                'bbox': cv2.boundingRect(contour)
-            }
-
-        # Create categories entry
-#         category_entry = {
-#             'id': annotation_id,
-#             'name': bbox
-#         }
-
-        coco_data['images'].append(image_entry)
-        coco_data['annotations'].append(annotation_entry)
-
-        annotation_id += 1
-
-    with open(id_ + '.json', 'w') as f:
-        json.dump(coco_data, f, indent=4)
-
-
-def annotate(im, display=True, save=True):
-    id_, name, image = im
+    print("\n Annotating image: ", name)
 
     im_dict = {}
-    im_dict['id'] = id_
     im_dict['file_name'] = name
-    im_dict['width'] = image.shape[1]
-    im_dict['height'] = image.shape[0]
+    im_dict['image'] = image
     im_dict['contours'] = mask_to_annotation(image)
+    im_dict['directory'] = directory
 
-    if display:
-        display()
+    if do_display:
+        display(im_dict, annotation_color)
 
-    if save:
-        save(im_dict, id_)
+    if do_save:
+        save(im_dict)
+        print('\033[92m', "Succesfully saved image: ", name, '\033[0m\n\n')
+    print("-"*120)
