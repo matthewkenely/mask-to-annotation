@@ -6,9 +6,15 @@ import os
 
 
 def mask_to_annotation(mask):
-    mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-    _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    mask_gray = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+    mask_thresh = cv2.adaptiveThreshold(
+        mask_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+
+    kernel = np.ones((5, 5), np.uint8)
+    mask_closed = cv2.morphologyEx(mask_thresh, cv2.MORPH_CLOSE, kernel)
+
+    contours, _ = cv2.findContours(
+        mask_closed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     sorted_contours = []
     for contour in contours:
@@ -45,7 +51,7 @@ def display(im_dict, annotation_color):
     plt.rcParams['axes.titlesize'] = 20
     plt.title('Annotation')
     plt.imshow(im_dict['image'], interpolation='nearest')
-    plt.plot(x, y, annotation_color, linewidth=2)
+    plt.plot(x, y, annotation_color, linewidth=3)
     plt.axis('off')
     plt.show()
 
