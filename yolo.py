@@ -102,7 +102,7 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
     print("\n Annotating image: ", name)
 
     im_dict = {}
-    im_dict['file_name'] = name
+    im_dict['file_name'] = os.path.splitext(name)[0]
     im_dict['image'] = image
     im_dict['category'] = category
     im_dict['contours'] = mask_to_annotation(image)

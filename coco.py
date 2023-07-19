@@ -8,8 +8,12 @@ import os
 def mask_to_annotation(mask):
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
-    dilation_kernel = np.ones((10, 10), np.uint8)
-    dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=2)
+
+    # increase standard deviation to blur more
+    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
+
+    dilation_kernel = np.ones((5, 5), np.uint8)
+    dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=3)
     eroded_mask = cv2.erode(dilated_mask, dilation_kernel, iterations=1)
     contours, _ = cv2.findContours(
         eroded_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
@@ -17,7 +21,7 @@ def mask_to_annotation(mask):
     sorted_contours = []
     for contour in contours:
         area = cv2.contourArea(contour)
-        if area > 1000:  # Example area threshold
+        if area > 2000:  # Example area threshold
             # Approximate the contour to reduce the number of points
             # Adjust the epsilon value as needed
             epsilon = 0.002 * cv2.arcLength(contour, True)
