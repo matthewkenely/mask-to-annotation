@@ -2,11 +2,8 @@ COTSDataset
 output
 settings.json
 __pycache__
-```
 .ipynb_checkpoints
-```
 .vscode
-```
-```
 COCO_annotations
 YOLO_annotations
+VGG_annotations
