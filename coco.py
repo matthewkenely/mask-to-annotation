@@ -8,7 +8,11 @@ import os
 def mask_to_annotation(mask):
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    dilation_kernel = np.ones((10, 10), np.uint8)
+    dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=2)
+    eroded_mask = cv2.erode(dilated_mask, dilation_kernel, iterations=1)
+    contours, _ = cv2.findContours(
+        eroded_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     sorted_contours = []
     for contour in contours:
