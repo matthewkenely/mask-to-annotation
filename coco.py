@@ -86,7 +86,7 @@ def save(im_dict):
             'iscrowd': 0,
             'image_id': im_dict['id'],
             'category_id': im_dict['id'],
-            'segmentation': contour.flatten().tolist(),
+            'segmentation': [contour.flatten().tolist()],
             'bbox': cv2.boundingRect(contour),
             'area': cv2.contourArea(contour)
         })
@@ -107,7 +107,7 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
     print("\n Annotating image: ", name)
 
     im_dict = {}
-    im_dict['id'] = id_
+    im_dict['id'] = 0  # id_
     im_dict['file_name'] = name
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
