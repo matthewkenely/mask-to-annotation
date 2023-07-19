@@ -91,6 +91,7 @@ souvenirs_oc
 
 <!-- Show json output -->
 <h3>Annotation (JSON)</h3>
+
 ```json
 {
     "food_3_colour_mask_1_mask.png": {
