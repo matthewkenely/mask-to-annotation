@@ -59,27 +59,28 @@ def display(im_dict, annotation_color):
 
 
 def save(im_dict):
-    coco_data = {
-        'info': {
-            'description': im_dict['project_name']
-        },
-        'images': [
-            {
-                'id': im_dict['id'],
-                'width': im_dict['width'],
-                'height': im_dict['height'],
-                'file_name': im_dict['file_name']
+    vgg_data = {
+        str(im_dict['file_name']): {
+            "fileref": "",
+            "size": im_dict['width'],
+            "filename": im_dict['file_name'],
+            "base64_img_data": "",
+            "file_attributes": {
+            },
+            "regions": {
+                "0": {
+                    "shape_attributes": {
+                        "name": "polygon",
+                        "all_points_x": [],
+                        "all_points_y": []
+                    },
+                    "region_attributes": {
+                        "label": im_dict['category']
+                    }
+                }
             }
-        ],
-        'annotations': [
-            # Added later
-        ],
-        'categories': [
-            {
-                'id': im_dict['id'],
-                'name': im_dict['category']
-            }
-        ]
+
+        }
     }
 
     for contour in im_dict['contours']:
@@ -89,15 +90,10 @@ def save(im_dict):
         if contour.shape[0] < 3:
             continue
 
-        coco_data['annotations'].append({
-            'id': im_dict['id'],
-            'iscrowd': 0,
-            'image_id': im_dict['id'],
-            'category_id': im_dict['id'],
-            'segmentation': [contour.flatten().tolist()],
-            'bbox': cv2.boundingRect(contour),
-            'area': cv2.contourArea(contour)
-        })
+        vgg_data[str(im_dict['file_name'])]["regions"]["0"]["shape_attributes"]["all_points_x"] = [
+            int(contour[i][0][0]) for i in range(contour.shape[0])]
+        vgg_data[str(im_dict['file_name'])]["regions"]["0"]["shape_attributes"]["all_points_y"] = [
+            int(contour[i][0][1]) for i in range(contour.shape[0])]
 
         if not os.path.exists(im_dict['directory']):
             os.makedirs(im_dict['directory'])
@@ -106,7 +102,7 @@ def save(im_dict):
             "./"+im_dict['directory'], str(os.path.splitext(im_dict['file_name'])[0]) + '.json')
 
         with open(file_path, 'w') as f:
-            json.dump(coco_data, f, indent=4)
+            json.dump(vgg_data, f, indent=4)
 
 
 def annotate(im, do_display=True, do_save=True, annotation_color='g'):
