@@ -4,6 +4,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 <hr>
 
+**<h2 name="coco-annotations">Table of Contents</h2>**
+
 **[COCO Annotations](#coco-annotations)** \
 **[YOLOv4 Annotations](#yolo-annotations)** \
 **[VGG Annotations](#vgg-annotations)**
@@ -14,6 +16,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 <!-- Show images -->
 <h3>Images</h3>
 <p align="center"><img src='./Assets/coco_annotation_1.png'></p>
+<p align="center"><img src='./Assets/coco_original_1.png'></p>
 
 
 <!-- Show json output -->
@@ -64,6 +67,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 <!-- Show images -->
 <h3>Images</h3>
 <p align="center"><img src='./Assets/yolo_annotation_1.png'></p>
+<p align="center"><img src='./Assets/yolo_original_1.png'></p>
 
 
 <!-- Show txt output -->
@@ -83,8 +87,10 @@ souvenirs_oc
 <!-- Show images -->
 <h3>Images</h3>
 <p align="center"><img src='./Assets/vgg_annotation_1.png'></p>
+<p align="center"><img src='./Assets/vgg_original_1.png'></p>
 
 <!-- Show json output -->
+<h3>Annotation (JSON)</h3>
 ```json
 {
     "food_3_colour_mask_1_mask.png": {
