@@ -76,8 +76,12 @@ def save(im_dict):
     with open(file_path, 'w') as f:
         for count, contour in enumerate(im_dict['contours']):
             x, y, w, h = contour
-            x, y, w, h = [float(value) / 1000 for value in [x, y, w, h]]
-            f.write("0  " + str(x) + " " +
+            x = x/im_dict['image'].shape[1]
+            y = y/im_dict['image'].shape[0]
+            w = w/im_dict['image'].shape[1]
+            h = h/im_dict['image'].shape[0]
+
+            f.write("0 " + str(x) + " " +
                     str(y) + " " + str(w) + " " + str(h)+"\n")
         f.close()
 
