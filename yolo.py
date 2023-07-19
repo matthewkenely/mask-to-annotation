@@ -75,11 +75,15 @@ def save(im_dict):
 
     with open(file_path, 'w') as f:
         for count, contour in enumerate(im_dict['contours']):
+            # Formatting to account for YOLO format
             x, y, w, h = contour
             x = x/im_dict['image'].shape[1]
             y = y/im_dict['image'].shape[0]
             w = w/im_dict['image'].shape[1]
             h = h/im_dict['image'].shape[0]
+
+            x = x + w / 2
+            y = y + h / 2
 
             f.write("0 " + str(x) + " " +
                     str(y) + " " + str(w) + " " + str(h)+"\n")
