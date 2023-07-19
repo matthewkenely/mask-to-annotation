@@ -10,12 +10,16 @@ By leveraging contour detection algorithms and image processing techniques, our 
 
 **<h2 name="coco-annotations">Table of Contents</h2>**
 
-**[COCO Annotations](#coco-annotations)** \
-**[YOLO Annotations](#yolo-annotations)** \
-**[VGG Annotations](#vgg-annotations)** \
-**[Annotation Generation Pipeline](#annotation-pipeline)**
+- **[Examples](#examples)**
+  - [COCO Annotations](#coco-annotations)
+  - [YOLO Annotations](#yolo-annotations)
+  - [VGG Annotations](#vgg-annotations)
+- **[Backend](#backend)**
+  - [Annotation Generation Pipeline](#annotation-pipeline)
 
 <hr>
+
+**<h1 name="examples">Examples</h1>**
 
 **<h2 name="coco-annotations">COCO Annotations</h2>**
 <!-- Show images -->
@@ -125,6 +129,9 @@ souvenirs_oc
 }
 ```
 
+<hr>
+
+**<h1 name="backend">Backend</h1>**
 **<h2 name="annotation-pipeline">Annotation Generation Pipeline</h2>**
 ```python
 {annotation style}.py:
