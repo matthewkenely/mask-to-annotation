@@ -4,13 +4,16 @@
 
 By leveraging contour detection algorithms and image processing techniques, our software automates the annotation process, saving valuable time and effort.
 
+
+
 <hr>
 
 **<h2 name="coco-annotations">Table of Contents</h2>**
 
 **[COCO Annotations](#coco-annotations)** \
-**[YOLOv4 Annotations](#yolo-annotations)** \
-**[VGG Annotations](#vgg-annotations)**
+**[YOLO Annotations](#yolo-annotations)** \
+**[VGG Annotations](#vgg-annotations)** \
+**[Annotation Generation Pipeline](#annotation-pipeline)**
 
 <hr>
 
@@ -120,4 +123,22 @@ souvenirs_oc
         }
     }
 }
+```
+
+**<h2 name="annotation-pipeline">Annotation Generation Pipeline</h2>**
+```python
+{annotation style}.py:
+
+def mask_to_annotation(mask):
+. . .
+
+def display(im_dict, annotation_color):
+. . .
+
+def save(im_dict):
+. . .
+
+def annotate(im, do_display=True, do_save=True, annotation_color='g'):
+. . .
+
 ```
