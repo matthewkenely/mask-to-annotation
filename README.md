@@ -1,6 +1,8 @@
 **<h1>mask-to-annotation</h1>**
 <!-- Describe the software -->
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+**mask-to-annotation** is a powerful and efficient tool for automatically generating annotations in popular computer vision formats such as COCO, YOLO, and VGG from saliency masks.
+
+By leveraging contour detection algorithms and image processing techniques, our software automates the annotation process, saving valuable time and effort.
 
 <hr>
 
