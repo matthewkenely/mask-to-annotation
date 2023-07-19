@@ -8,3 +8,5 @@ __pycache__
 .vscode
 ```
 ```
+COCO_annotations
+YOLO_annotations
