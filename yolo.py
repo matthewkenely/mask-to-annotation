@@ -67,14 +67,24 @@ def save(im_dict):
     if not os.path.exists(im_dict['directory']):
         os.makedirs(im_dict['directory'])
 
+    if not os.path.exists(im_dict['directory']+"/"+im_dict['file_name']):
+        os.makedirs(im_dict['directory']+"/"+im_dict['file_name'])
+
     file_path = os.path.join(
-        "./"+im_dict['directory'], str(im_dict['file_name']) + '.txt')
+        "./"+im_dict['directory']+"/"+im_dict['file_name'], str(im_dict['file_name']) + '.txt')
 
     with open(file_path, 'w') as f:
         for count, contour in enumerate(im_dict['contours']):
             x, y, w, h = contour
-            f.write(str(count)+" " + str(x) + " " +
+            x, y, w, h = [float(value) / 1000 for value in [x, y, w, h]]
+            f.write("0  " + str(x) + " " +
                     str(y) + " " + str(w) + " " + str(h)+"\n")
+        f.close()
+
+    labels_file_path = os.path.join(
+        "./"+im_dict['directory']+"/"+im_dict['file_name'], 'labels.txt')
+    with open(labels_file_path, 'w') as f:
+        f.write(im_dict['category'])
         f.close()
 
 
@@ -86,6 +96,7 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
     im_dict = {}
     im_dict['file_name'] = name
     im_dict['image'] = image
+    im_dict['category'] = category
     im_dict['contours'] = mask_to_annotation(image)
     im_dict['directory'] = directory
 
