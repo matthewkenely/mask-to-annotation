@@ -11,33 +11,29 @@ def mask_to_annotation(mask):
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
     # outlining the contours in the image
     contours, _ = cv2.findContours(
-        mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Looping through the contours and finding the bounding boxes
-    bounding_boxes = []
+    # variables to store the minimum and maximum x, y coordinates
+    min_x = min_y = float('inf')
+    max_x = max_y = 0
+
+    # looping through all the contours and finding the minimum and maximum x, y coordinates
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
-        current_box = (x, y, w, h)
-        is_nested = False
+        min_x = min(min_x, x)
+        min_y = min(min_y, y)
+        max_x = max(max_x, x + w)
+        max_y = max(max_y, y + h)
 
-        # Checking if the current bounding box is nested inside another bounding box
-        # If yes, then current bounding box is ignored
-        for box in bounding_boxes:
-            if box[0] <= x and box[1] <= y and (box[0] + box[2]) >= (x + w) and (box[1] + box[3]) >= (y + h):
-                is_nested = True
-                break
+    # calculating the width and height of the bounding box
+    bounding_box_width = max_x - min_x
+    bounding_box_height = max_y - min_y
 
-        if not is_nested:
-            bounding_boxes.append(current_box)
+    # creating the single bounding box using the calculated coordinates
+    single_bounding_box = (
+        min_x, min_y, bounding_box_width, bounding_box_height)
 
-    # Sorting bounding boxes based on area in descending order
-    bounding_boxes = sorted(
-        bounding_boxes, key=lambda box: box[2] * box[3], reverse=True)
-
-    # Taking the first two non-nested bounding boxes
-    bounding_boxes = bounding_boxes[:2]
-
-    return bounding_boxes
+    return [single_bounding_box]
 
 
 def display(im_dict, annotation_color):
@@ -46,7 +42,7 @@ def display(im_dict, annotation_color):
     for contour in im_dict['contours']:
         x, y, w, h = contour
         cv2.rectangle(image_with_bounding_box, (x, y),
-                      (x+w, y+h), annotation_color, 8)
+                      (x+w, y+h), annotation_color, 7)
 
     # Displaying original mask on the left and annotation on the right
     plt.rcParams["figure.figsize"] = (20, 10)
