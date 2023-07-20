@@ -19,18 +19,18 @@ def mask_to_annotation(mask):
     eroded_mask = cv2.erode(dilated_mask, dilation_kernel, iterations=1)
     # outlining the contours in the image
     contours, _ = cv2.findContours(
-        eroded_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        eroded_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     # Looping through the contours
     sorted_contours = []
     for contour in contours:
-        area = cv2.contourArea(contour)
-        if area > 2000:  # Example area threshold
-            # Approximating the polygon to reduce the number of points
-            # Adjust the epsilon value as needed
-            epsilon = 0.002 * cv2.arcLength(contour, True)
-            approx_contour = cv2.approxPolyDP(contour, epsilon, True)
-            sorted_contours.append(approx_contour)
+        # area = cv2.contourArea(contour)
+        # if area > 2000:  # Example area threshold
+        #     # Approximating the polygon to reduce the number of points
+        #     # Adjust the epsilon value as needed
+        epsilon = 0.002 * cv2.arcLength(contour, True)
+        approx_contour = cv2.approxPolyDP(contour, epsilon, True)
+        sorted_contours.append(approx_contour)
 
     # Sorting the contours based on the y coordinate of the bounding box
     sorted_contours = sorted(
@@ -40,10 +40,10 @@ def mask_to_annotation(mask):
 
 
 def display(im_dict, annotation_color):
-    # Retrieving the x and y coordinates of the contours
-    for i in range(len(im_dict['contours'])):
-        x = im_dict['contours'][i][:, 0, 0]
-        y = im_dict['contours'][i][:, 0, 1]
+    # Displaying the contours on the image
+    annotated_image = im_dict['image'].copy()
+    cv2.drawContours(annotated_image, im_dict['contours'], -1,
+                     annotation_color, 7, cv2.LINE_AA)
 
     # Display original mask on the left and annotation on the right
     plt.rcParams["figure.figsize"] = (20, 10)
@@ -57,8 +57,7 @@ def display(im_dict, annotation_color):
     plt.subplot(122)
     plt.rcParams['axes.titlesize'] = 20
     plt.title('Annotation')
-    plt.imshow(im_dict['image'], interpolation='nearest')
-    plt.plot(x, y, annotation_color, linewidth=3)
+    plt.imshow(annotated_image, interpolation='nearest')
     plt.axis('off')
     plt.show()
 
