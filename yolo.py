@@ -123,3 +123,5 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
         save(im_dict)
         print('\033[92m', "Succesfully saved image: ", name, '\033[0m\n\n')
     print("-"*120)
+
+    return im_dict
