@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 
-def mask_to_annotation(mask):
+def mask_to_annotation(mask, epsilon):
     # transforming image into a binary image
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
@@ -28,8 +28,8 @@ def mask_to_annotation(mask):
         # if area > 2000:  # Example area threshold
         #     # Approximating the polygon to reduce the number of points
         #     # Adjust the epsilon value as needed
-        epsilon = 0.002 * cv2.arcLength(contour, True)
-        approx_contour = cv2.approxPolyDP(contour, epsilon, True)
+        # epsilon = epsilon * cv2.arcLength(contour, True)
+        approx_contour = cv2.approxPolyDP(contour, epsilon * cv2.arcLength(contour, True), True)
         sorted_contours.append(approx_contour)
 
     # Sorting the contours based on the y coordinate of the bounding box
@@ -116,11 +116,12 @@ def save(im_dict):
             json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, annotation_color='g'):
+def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color='g', epsilon=0.024):
     # Retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
-    print("\n Annotating image: ", name)
+    if do_print:
+        print("\n Annotating image: ", name)
 
     # Creating a dictionary to store the image and its annotations
     im_dict = {}
@@ -129,7 +130,7 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
-    im_dict['contours'] = mask_to_annotation(image)
+    im_dict['contours'] = mask_to_annotation(image, epsilon)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
     im_dict['directory'] = directory
@@ -140,7 +141,10 @@ def annotate(im, do_display=True, do_save=True, annotation_color='g'):
 
     if do_save:
         save(im_dict)
-        print('\033[92m', "Succesfully saved image: ", name, '\033[0m\n\n')
-    print("-"*120)
+        if do_print:
+            print('\033[92m', "Succesfully saved image: ", name, '\033[0m\n\n')
+
+    if do_print:
+        print("-"*120)
 
     return im_dict
