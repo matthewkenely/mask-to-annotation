@@ -5,9 +5,20 @@ import matplotlib.pyplot as plt
 import os
 import annotation_helper as ah
 
+# Constants
+# Polygon approximation
+PA = 0
+# K-means clustering
+KMC = 1
 
-def mask_to_annotation(mask, epsilon):
-    return ah.polygon_approximation(mask, epsilon)
+
+def mask_to_annotation(mask, epsilon, configuration):
+    if configuration == PA:
+        return ah.polygon_approximation(mask, epsilon)
+    elif configuration == KMC:
+        return ah.k_means_clustering(mask, epsilon, num_clusters=10)
+    else:
+        pass
 
 
 def display(im_dict, annotation_color):
@@ -87,7 +98,7 @@ def save(im_dict):
             json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.024):
+def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.002, configuration=PA):
     # Retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
@@ -101,7 +112,7 @@ def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
-    im_dict['contours'] = mask_to_annotation(image, epsilon)
+    im_dict['contours'] = mask_to_annotation(image, epsilon, configuration)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
     im_dict['directory'] = directory
