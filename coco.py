@@ -10,8 +10,6 @@ import annotation_helper as ah
 PA = 0
 # K-means clustering
 KMC = 1
-# Segment-anything
-SA = 2
 
 
 def mask_to_annotation(mask, epsilon, configuration):
@@ -19,8 +17,6 @@ def mask_to_annotation(mask, epsilon, configuration):
         return ah.polygon_approximation(mask, epsilon)
     elif configuration == KMC:
         return ah.k_means_clustering(mask, epsilon, num_clusters=10)
-    elif configuration == SA:
-        return ah.segment_anything(mask)
     else:
         pass
 
@@ -116,7 +112,7 @@ def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
-    im_dict['contours'] = mask_to_annotation(image, epsilon)
+    im_dict['contours'] = mask_to_annotation(image, epsilon,configuration)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
     im_dict['directory'] = directory

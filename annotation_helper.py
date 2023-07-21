@@ -1,20 +1,5 @@
-# Dependencies required for segment-anything
-# %pip install git+https://github.com/facebookresearch/segment-anything.git
-# %pip install torch torchvision
-from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
-
 import cv2
 import numpy as np
-
-# Segment-anything model
-# Downloading model checkpoint:
-# Utilise the following link: https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
-# Place the downloaded checkpoint in a new directory named Sam_checkpoints
-sam_checkpoint = "Sam_checkpoints/sam_vit_h_4b8939.pth"
-model_type = "vit_h"
-
-sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-mask_generator = SamAutomaticMaskGenerator(sam)
 
 
 def single_object_bounding_box(mask):
@@ -134,17 +119,3 @@ def k_means_clustering(mask, epsilon, num_clusters):
     annotations = [convex_hull]
 
     return annotations
-
-
-def segment_anything(mask):
-    # generating masks using segment-anything
-    masks = mask_generator.generate(mask)
-    print("Number of masks generated: ", len(masks))
-    # transforming image into a binary image
-    _, binary_mask = cv2.threshold(masks, 127, 255, cv2.THRESH_BINARY)
-
-    # finding contours in the binary mask
-    contours, _ = cv2.findContours(
-        binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    return contours
