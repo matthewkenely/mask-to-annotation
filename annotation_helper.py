@@ -41,7 +41,7 @@ def polygon_approximation(mask, epsilon):
     # increasing standard deviation to blur more (repairing the mask)
     mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
 
-    # Applying dilation and erosion to the mask
+    # applying dilation (optional) and erosion to the mask
     kernel = np.ones((3, 3), np.uint8)
     # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
     eroded_mask = cv2.erode(mask, kernel, iterations=1)
@@ -50,7 +50,7 @@ def polygon_approximation(mask, epsilon):
     contours, _ = cv2.findContours(
         eroded_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Looping through the contours
+    # looping through the contours
     sorted_contours = []
     for contour in contours:
         # area = cv2.contourArea(contour)
@@ -62,7 +62,7 @@ def polygon_approximation(mask, epsilon):
             contour, epsilon * cv2.arcLength(contour, True), True)
         sorted_contours.append(approx_contour)
 
-    # Sorting the contours based on the y coordinate of the bounding box
+    # sorting the contours based on the y coordinate of the bounding box
     sorted_contours = sorted(
         sorted_contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
 
@@ -77,7 +77,7 @@ def k_means_clustering(mask, epsilon, max_clusters):
     # increasing standard deviation to blur more (repairing the mask)
     mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
 
-    # Applying dilation and erosion to the mask
+    # applying dilation (optional) and erosion to the mask
     kernel = np.ones((3, 3), np.uint8)
     # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
     eroded_mask = cv2.erode(mask, kernel, iterations=1)
@@ -86,41 +86,31 @@ def k_means_clustering(mask, epsilon, max_clusters):
     contours, _ = cv2.findContours(
         eroded_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Looping through the contours
-    sorted_contours = []
-    for contour in contours:
-        # area = cv2.contourArea(contour)
-        # if area > 2000:  # Example area threshold
-        #     # Approximating the polygon to reduce the number of points
-        #     # Adjust the epsilon value as needed
-        # epsilon = epsilon * cv2.arcLength(contour, True)
-        # approx_contour = cv2.approxPolyDP(
-        #     contour, epsilon * cv2.arcLength(contour, True), True)
-        # sorted_contours.append(approx_contour)
-        sorted_contours.append(contour)
+    # sorting the contours based on the y coordinate of the bounding box    
+    sorted_contours = sorted(contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
 
-
-    # Flatten the contours and convert to np.float32
+    # flatten the contours and convert to np.float32
     flattened_points = np.concatenate(
         sorted_contours).squeeze().astype(np.float32)
 
-    # Using k-means clustering to find cluster centers
+    # using k-means clustering to find cluster centers
     if max_clusters > len(flattened_points):
         max_clusters = len(flattened_points)
 
+    # using the elbow method to find the optimal number of clusters
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
     _, labels, centers = cv2.kmeans(
         flattened_points, max_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
-    # Converting back to contour format with int32 data type
+    # converting back to contour format with int32 data type
     kmeans_contours = [center.reshape(
         (-1, 1, 2)).astype(np.int32) for center in centers]
 
-    # Creating a convex hull using all the cluster centers
+    # creating a convex hull using all the cluster centers
     all_cluster_centers = np.concatenate(kmeans_contours)
     convex_hull = cv2.convexHull(all_cluster_centers)
 
-    # Drawing the convex hull to form the polygon annotation
+    # drawing the convex hull to form the polygon annotation
     annotations = [convex_hull]
 
     return annotations
