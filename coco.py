@@ -113,7 +113,7 @@ def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
-    im_dict['contours'] = mask_to_annotation(image, epsilon,configuration)
+    im_dict['contours'] = mask_to_annotation(image, epsilon, configuration)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
     im_dict['directory'] = directory
