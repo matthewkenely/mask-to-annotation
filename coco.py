@@ -5,9 +5,24 @@ import matplotlib.pyplot as plt
 import os
 import annotation_helper as ah
 
+# Constants
+# Polygon approximation
+PA = 0
+# K-means clustering
+KMC = 1
+# Segment-anything
+SA = 2
 
-def mask_to_annotation(mask, epsilon):
-    return ah.polygon_approximation(mask, epsilon)
+
+def mask_to_annotation(mask, epsilon, configuration):
+    if configuration == PA:
+        return ah.polygon_approximation(mask, epsilon)
+    elif configuration == KMC:
+        return ah.k_means_clustering(mask, epsilon, num_clusters=10)
+    elif configuration == SA:
+        return ah.segment_anything(mask)
+    else:
+        pass
 
 
 def display(im_dict, annotation_color):
@@ -87,7 +102,7 @@ def save(im_dict):
             json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0):
+def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=PA):
     # Retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
