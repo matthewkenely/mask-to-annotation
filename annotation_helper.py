@@ -53,14 +53,11 @@ def polygon_approximation(mask, epsilon):
     # looping through the contours
     sorted_contours = []
     for contour in contours:
-        # area = cv2.contourArea(contour)
-        # if area > 2000:  # Example area threshold
-        #     # Approximating the polygon to reduce the number of points
-        #     # Adjust the epsilon value as needed
-        # epsilon = epsilon * cv2.arcLength(contour, True)
-        approx_contour = cv2.approxPolyDP(
-            contour, epsilon * cv2.arcLength(contour, True), True)
-        sorted_contours.append(approx_contour)
+        area = cv2.contourArea(contour)
+        if area > 40:  # removing small noise
+            # Approximating the polygon to reduce the number of points
+            approx_contour = cv2.approxPolyDP(contour, epsilon * cv2.arcLength(contour, True), True)
+            sorted_contours.append(approx_contour)
 
     # sorting the contours based on the y coordinate of the bounding box
     sorted_contours = sorted(
