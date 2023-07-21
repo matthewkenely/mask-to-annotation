@@ -42,9 +42,10 @@ def polygon_approximation(mask, epsilon):
     mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
 
     # Applying dilation and erosion to the mask
-    dilation_kernel = np.ones((5, 5), np.uint8)
-    dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=3)
-    eroded_mask = cv2.erode(dilated_mask, dilation_kernel, iterations=1)
+    kernel = np.ones((3, 3), np.uint8)
+    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+    eroded_mask = cv2.erode(mask, kernel, iterations=1)
+
     # outlining the contours in the image
     contours, _ = cv2.findContours(
         eroded_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)

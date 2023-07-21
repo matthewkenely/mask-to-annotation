@@ -87,7 +87,7 @@ def save(im_dict):
             json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.024):
+def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0):
     # Retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
