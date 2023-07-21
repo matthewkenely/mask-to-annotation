@@ -16,7 +16,7 @@ def mask_to_annotation(mask, epsilon, configuration):
     if configuration == PA:
         return ah.polygon_approximation(mask, epsilon)
     elif configuration == KMC:
-        return ah.k_means_clustering(mask, epsilon, num_clusters=10)
+        return ah.k_means_clustering(mask, epsilon, max_clusters=100)
     else:
         pass
 

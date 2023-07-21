@@ -69,7 +69,7 @@ def polygon_approximation(mask, epsilon):
     return sorted_contours
 
 
-def k_means_clustering(mask, epsilon, num_clusters):
+def k_means_clustering(mask, epsilon, max_clusters):
     # transforming image into a binary image
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
@@ -78,9 +78,9 @@ def k_means_clustering(mask, epsilon, num_clusters):
     mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
 
     # Applying dilation and erosion to the mask
-    dilation_kernel = np.ones((5, 5), np.uint8)
-    dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=3)
-    eroded_mask = cv2.erode(dilated_mask, dilation_kernel, iterations=1)
+    kernel = np.ones((3, 3), np.uint8)
+    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+    eroded_mask = cv2.erode(mask, kernel, iterations=1)
 
     # outlining the contours in the image
     contours, _ = cv2.findContours(
@@ -94,18 +94,23 @@ def k_means_clustering(mask, epsilon, num_clusters):
         #     # Approximating the polygon to reduce the number of points
         #     # Adjust the epsilon value as needed
         # epsilon = epsilon * cv2.arcLength(contour, True)
-        approx_contour = cv2.approxPolyDP(
-            contour, epsilon * cv2.arcLength(contour, True), True)
-        sorted_contours.append(approx_contour)
+        # approx_contour = cv2.approxPolyDP(
+        #     contour, epsilon * cv2.arcLength(contour, True), True)
+        # sorted_contours.append(approx_contour)
+        sorted_contours.append(contour)
+
 
     # Flatten the contours and convert to np.float32
     flattened_points = np.concatenate(
         sorted_contours).squeeze().astype(np.float32)
 
     # Using k-means clustering to find cluster centers
+    if max_clusters > len(flattened_points):
+        max_clusters = len(flattened_points)
+
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
     _, labels, centers = cv2.kmeans(
-        flattened_points, num_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+        flattened_points, max_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
     # Converting back to contour format with int32 data type
     kmeans_contours = [center.reshape(
