@@ -10,18 +10,14 @@ import annotation_helper as ah
 PA = 0
 # K-means clustering
 KMC = 1
-# Segment-anything
-SA = 2
 
 
 def mask_to_annotation(mask, epsilon, configuration):
     # checking the configuration
     if configuration == PA:
-        return ah.polygon_approximation(mask, epsilon)
+        return ah.single_object_polygon_approximation(mask, epsilon)
     elif configuration == KMC:
-        return ah.k_means_clustering(mask, epsilon, max_clusters=10)
-    elif configuration == SA:
-        return ah.segment_anything(mask)
+        return ah.single_object_k_means_clustering(mask, epsilon, max_clusters=10)
     else:
         pass
 

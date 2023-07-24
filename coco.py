@@ -10,23 +10,38 @@ import annotation_helper as ah
 PA = 0
 # K-means clustering
 KMC = 1
+# Single objects
+SO = 0
+# Multiple objects
+MO = 1
 
 
-def mask_to_annotation(mask, epsilon, configuration, do_cvt):
+def mask_to_annotation(mask, epsilon, configuration, object_configuration, do_cvt):
     # checking the configuration
-    if configuration == PA:
-        return ah.polygon_approximation(mask, epsilon, do_cvt)
-    elif configuration == KMC:
-        return ah.k_means_clustering(mask, epsilon, max_clusters=100)
+    if configuration == PA and object_configuration == SO:
+        return ah.single_object_polygon_approximation(mask, epsilon, do_cvt)
+    elif configuration == PA and object_configuration == MO:
+        return ah.multiple_objects_polygon_approximation(mask, epsilon, do_cvt)
+    elif configuration == KMC and object_configuration == SO:
+        return ah.single_object_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
+    elif configuration == KMC and object_configuration == MO:
+        return ah.multiple_objects_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
     else:
         pass
 
 
-def display(im_dict, annotation_color):
+def display(im_dict, annotation_color, object_configuration):
     # displaying the contours on the image
     annotated_image = im_dict['image'].copy()
-    cv2.drawContours(annotated_image, im_dict['contours'], -1,
-                     annotation_color, 7, cv2.LINE_AA)
+    if (object_configuration == SO):
+        cv2.drawContours(annotated_image, im_dict['contours'], -1,
+                         annotation_color, 7, cv2.LINE_AA)
+    else:
+        # drawing each contour on the blank image with the specified annotation_color
+        for label, contours in im_dict['contours'].items():
+            for contour in contours:
+                cv2.drawContours(annotated_image, [contour], -1,
+                                 annotation_color, 7, cv2.LINE_AA)
 
     # displaying original mask on the left and annotation on the right
     plt.rcParams["figure.figsize"] = (20, 10)
@@ -45,7 +60,7 @@ def display(im_dict, annotation_color):
     plt.show()
 
 
-def save(im_dict):
+def save(im_dict, object_configuration):
     # creating a dictionary in COCO format
     coco_data = {
         'info': {
@@ -68,38 +83,59 @@ def save(im_dict):
         ]
     }
 
-    # looping through the contours and adding them to the dictionary
-    for contour in im_dict['contours']:
-        contour = np.array(contour, dtype=np.float32)
+    if (object_configuration == SO):
+        # looping through the contours and adding them to the dictionary
+        for contour in im_dict['contours']:
+            contour = np.array(contour, dtype=np.float32)
 
-        # checking if the contour has enough points
-        if contour.shape[0] < 3:
-            continue
+            # checking if the contour has enough points
+            if contour.shape[0] < 3:
+                continue
 
-        # adding the contour to the dictionary
-        coco_data['annotations'].append({
-            'id': im_dict['id'],
-            'iscrowd': 0,
-            'image_id': im_dict['id'],
-            'category_id': im_dict['id'],
-            'segmentation': [contour.flatten().tolist()],
-            'bbox': cv2.boundingRect(contour),
-            'area': cv2.contourArea(contour)
-        })
+            # adding the contour to the dictionary
+            coco_data['annotations'].append({
+                'id': im_dict['id'],
+                'iscrowd': 0,
+                'image_id': im_dict['id'],
+                'category_id': im_dict['id'],
+                'segmentation': [contour.flatten().tolist()],
+                'bbox': cv2.boundingRect(contour),
+                'area': cv2.contourArea(contour)
+            })
+    else:
+        # Looping through the contours and adding them to the dictionary
+        for label, contours_list in im_dict['contours'].items():
+            for contour in contours_list:
+                contour = np.array(contour, dtype=np.float32)
 
-        # creating a directory to store the annotations
-        if not os.path.exists(im_dict['directory']):
-            os.makedirs(im_dict['directory'])
+                # Checking if the contour has enough points
+                if contour.shape[0] < 3:
+                    continue
 
-        # saving the annotations in COCO JSON file format
-        file_path = os.path.join(
-            "./"+im_dict['directory'], str(os.path.splitext(im_dict['file_name'])[0]) + '.json')
+                # Adding the contour to the dictionary
+                coco_data['annotations'].append({
+                    'id': len(coco_data['annotations']) + 1,
+                    'iscrowd': 0,
+                    'image_id': im_dict['id'],
+                    'category_id': im_dict['id'],
+                    'segmentation': [contour.flatten().tolist()],
+                    'bbox': cv2.boundingRect(contour),
+                    'area': cv2.contourArea(contour)
+                })
 
-        with open(file_path, 'w') as f:
-            json.dump(coco_data, f, indent=4)
+    # creating a directory to store the annotations
+    if not os.path.exists(im_dict['directory']):
+        os.makedirs(im_dict['directory'])
+
+    # saving the annotations in COCO JSON file format
+    file_path = os.path.join(
+        "./"+im_dict['directory'], str(os.path.splitext(im_dict['file_name'])[0]) + '.json')
+
+    with open(file_path, 'w') as f:
+        json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, do_cvt=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=PA):
+def annotate(im, do_display=True, do_save=True, do_cvt=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=PA, object_configuration=SO):
     # retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
@@ -113,17 +149,18 @@ def annotate(im, do_display=True, do_save=True, do_cvt=True, do_print=True, anno
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
-    im_dict['contours'] = mask_to_annotation(image, epsilon, configuration, do_cvt)
+    im_dict['contours'] = mask_to_annotation(
+        image, epsilon, configuration, object_configuration, do_cvt)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
     im_dict['directory'] = directory
 
     # displaying and saving the image, depending on the passed parameters
     if do_display:
-        display(im_dict, annotation_color)
+        display(im_dict, annotation_color, object_configuration)
 
     if do_save:
-        save(im_dict)
+        save(im_dict, object_configuration)
         if do_print:
             print('\033[92m', "Succesfully saved image: ", name, '\033[0m\n\n')
 
