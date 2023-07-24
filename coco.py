@@ -12,10 +12,10 @@ PA = 0
 KMC = 1
 
 
-def mask_to_annotation(mask, epsilon, configuration):
+def mask_to_annotation(mask, epsilon, configuration, do_cvt):
     # checking the configuration
     if configuration == PA:
-        return ah.polygon_approximation(mask, epsilon)
+        return ah.polygon_approximation(mask, epsilon, do_cvt)
     elif configuration == KMC:
         return ah.k_means_clustering(mask, epsilon, max_clusters=100)
     else:
@@ -99,7 +99,7 @@ def save(im_dict):
             json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=PA):
+def annotate(im, do_display=True, do_save=True, do_cvt=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=PA):
     # retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
@@ -113,7 +113,7 @@ def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=
     im_dict['image'] = image
     im_dict['width'] = image.shape[1]
     im_dict['height'] = image.shape[0]
-    im_dict['contours'] = mask_to_annotation(image, epsilon, configuration)
+    im_dict['contours'] = mask_to_annotation(image, epsilon, configuration, do_cvt)
     im_dict['project_name'] = project_name
     im_dict['category'] = category
     im_dict['directory'] = directory

@@ -1,0 +1,50 @@
+{
+    "info": {
+        "description": "COCOEvaluation"
+    },
+    "images": [
+        {
+            "id": 0,
+            "width": 640,
+            "height": 480,
+            "file_name": "000000573320.jpg"
+        }
+    ],
+    "annotations": [
+        {
+            "id": 0,
+            "iscrowd": 0,
+            "image_id": 0,
+            "category_id": 0,
+            "segmentation": [
+                [
+                    103.0,
+                    348.0,
+                    103.0,
+                    386.0,
+                    140.0,
+                    375.0,
+                    139.0,
+                    354.0,
+                    135.0,
+                    360.0,
+                    126.0,
+                    360.0
+                ]
+            ],
+            "bbox": [
+                103,
+                348,
+                38,
+                39
+            ],
+            "area": 904.0
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "COCO"
+        }
+    ]
+}
