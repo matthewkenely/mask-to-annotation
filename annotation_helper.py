@@ -73,7 +73,6 @@ def single_object_polygon_approximation(mask, epsilon, do_cvt):
     return sorted_contours
 
 
-<<<<<<< HEAD
 def multiple_objects_polygon_approximation(mask, epsilon, do_cvt):
     # Image Cleaning
     if do_cvt:
@@ -130,13 +129,6 @@ def single_object_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
         # thresholding the image
         _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
-=======
-def k_means_clustering(mask, epsilon, max_clusters, do_cvt):
-    # transforming image into a binary image
-    if do_cvt:
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
->>>>>>> 08ae8ecf571e5c59de6a536c47c3d059dee2f2fc
 
     # increasing standard deviation to blur more (repairing the mask)
     mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
