@@ -69,10 +69,11 @@ def polygon_approximation(mask, epsilon, do_cvt):
     return sorted_contours
 
 
-def k_means_clustering(mask, epsilon, max_clusters):
+def k_means_clustering(mask, epsilon, max_clusters, do_cvt):
     # transforming image into a binary image
-    mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-    _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+    if do_cvt:
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+        _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
 
     # increasing standard deviation to blur more (repairing the mask)
     mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
