@@ -5,9 +5,21 @@ import matplotlib.pyplot as plt
 import os
 import annotation_helper as ah
 
+# Constants
+# Single objects
+SINGLE_OBJ = 0
+# Multiple objects
+MULTIPLE_OBJ = 1
 
-def mask_to_annotation(mask):
-    return ah.single_object_bounding_box(mask)
+
+def mask_to_annotation(mask, object_configuration, do_cvt):
+    # checking the configuration
+    if object_configuration == SINGLE_OBJ:
+        return ah.single_object_bounding_box(mask, do_cvt)
+    elif object_configuration == MULTIPLE_OBJ:
+        return ah.multiple_objects_bounding_box(mask, do_cvt)
+    else:
+        pass
 
 
 def display(im_dict, annotation_color):
@@ -59,7 +71,7 @@ def save(im_dict):
             x = x + w / 2
             y = y + h / 2
 
-            f.write("0 " + str(x) + " " +
+            f.write(str(count)+" " + str(x) + " " +
                     str(y) + " " + str(w) + " " + str(h)+"\n")
         f.close()
 
@@ -71,7 +83,7 @@ def save(im_dict):
         f.close()
 
 
-def annotate(im, do_display=True, do_save=True, annotation_color=(0, 255, 0)):
+def annotate(im, do_display=True, do_save=True, annotation_color=(0, 255, 0), object_configuration=SINGLE_OBJ, do_cvt=True):
     # retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
@@ -82,7 +94,8 @@ def annotate(im, do_display=True, do_save=True, annotation_color=(0, 255, 0)):
     im_dict['file_name'] = os.path.splitext(name)[0]
     im_dict['image'] = image
     im_dict['category'] = category
-    im_dict['contours'] = mask_to_annotation(image)
+    im_dict['contours'] = mask_to_annotation(
+        image, object_configuration, do_cvt)
     im_dict['directory'] = directory
 
     # displaying and saving the image, depending on the passed parameters

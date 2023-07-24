@@ -7,24 +7,24 @@ import annotation_helper as ah
 
 # Constants
 # Polygon approximation
-PA = 0
+POLY_APPROX = 0
 # K-means clustering
-KMC = 1
+K_MEANS_CLUSTER = 1
 # Single objects
-SO = 0
+SINGLE_OBJ = 0
 # Multiple objects
-MO = 1
+MULTIPLE_OBJ = 1
 
 
 def mask_to_annotation(mask, epsilon, configuration, object_configuration, do_cvt):
     # checking the configuration
-    if configuration == PA and object_configuration == SO:
+    if configuration == POLY_APPROX and object_configuration == SINGLE_OBJ:
         return ah.single_object_polygon_approximation(mask, epsilon, do_cvt)
-    elif configuration == PA and object_configuration == MO:
+    elif configuration == POLY_APPROX and object_configuration == MULTIPLE_OBJ:
         return ah.multiple_objects_polygon_approximation(mask, epsilon, do_cvt)
-    elif configuration == KMC and object_configuration == SO:
+    elif configuration == K_MEANS_CLUSTER and object_configuration == SINGLE_OBJ:
         return ah.single_object_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
-    elif configuration == KMC and object_configuration == MO:
+    elif configuration == K_MEANS_CLUSTER and object_configuration == MULTIPLE_OBJ:
         return ah.multiple_objects_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
     else:
         pass
@@ -33,7 +33,7 @@ def mask_to_annotation(mask, epsilon, configuration, object_configuration, do_cv
 def display(im_dict, annotation_color, object_configuration):
     # displaying the contours on the image
     annotated_image = im_dict['image'].copy()
-    if (object_configuration == SO):
+    if (object_configuration == SINGLE_OBJ):
         cv2.drawContours(annotated_image, im_dict['contours'], -1,
                          annotation_color, 7, cv2.LINE_AA)
     else:
@@ -83,7 +83,7 @@ def save(im_dict, object_configuration):
         ]
     }
 
-    if (object_configuration == SO):
+    if (object_configuration == SINGLE_OBJ):
         # looping through the contours and adding them to the dictionary
         for contour in im_dict['contours']:
             contour = np.array(contour, dtype=np.float32)
@@ -135,7 +135,7 @@ def save(im_dict, object_configuration):
         json.dump(coco_data, f, indent=4)
 
 
-def annotate(im, do_display=True, do_save=True, do_cvt=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=PA, object_configuration=SO):
+def annotate(im, do_display=True, do_save=True, do_print=True, annotation_color=(255, 0, 255), epsilon=0.005, configuration=POLY_APPROX, object_configuration=SINGLE_OBJ, do_cvt=True):
     # retrieving parameters from the tuple
     id_, name, image, project_name, category, directory = im
 
