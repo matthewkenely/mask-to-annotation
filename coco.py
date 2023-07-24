@@ -18,6 +18,7 @@ MO = 1
 
 def mask_to_annotation(mask, epsilon, configuration, object_configuration, do_cvt):
     # checking the configuration
+<<<<<<< HEAD
     if configuration == PA and object_configuration == SO:
         return ah.single_object_polygon_approximation(mask, epsilon, do_cvt)
     elif configuration == PA and object_configuration == MO:
@@ -26,6 +27,12 @@ def mask_to_annotation(mask, epsilon, configuration, object_configuration, do_cv
         return ah.single_object_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
     elif configuration == KMC and object_configuration == MO:
         return ah.multiple_objects_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
+=======
+    if configuration == PA:
+        return ah.polygon_approximation(mask, epsilon, do_cvt=do_cvt)
+    elif configuration == KMC:
+        return ah.k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
+>>>>>>> 08ae8ecf571e5c59de6a536c47c3d059dee2f2fc
     else:
         pass
 
