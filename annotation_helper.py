@@ -51,43 +51,25 @@ def single_object_bounding_box(mask, do_cvt):
 
 
 def multiple_objects_bounding_box(mask, do_cvt):
-    # transforming image into a binary image
-    if do_cvt:
-        # transforming image into a binary image
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        # thresholding the image
-        _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
-
-    # increasing standard deviation to blur more (anti-aliasing)
-    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
-
-    # applying dilation (optional) and erosion to the mask
-    kernel = np.ones((3, 3), np.uint8)
-    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
-    eroded_mask = cv2.erode(mask, kernel, iterations=1)
-
-    # outlining the contours in the image
-    contours, _ = cv2.findContours(
-        mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-
-    # sorting the contours based on their size, largest to smallest
-    contours = sorted(contours, key=lambda ctr: cv2.contourArea(ctr))[::-1]
-
-    # Creating bounding boxes for each contour
+    # list   to store the bounding boxes
     bounding_boxes = []
-    for contour in contours:
-        if (cv2.contourArea(contour) > NOISE_THRESHOLD):  # removing small noise
-            # making sure that the bounding box is not inside another bounding box
-            x, y, w, h = cv2.boundingRect(contour)
-            is_inside = False
-            for nested_box in bounding_boxes:
-                nx, ny, nw, nh = nested_box
-                if (nx <= x and ny <= y and nx + nw >= x + w and ny + nh >= y + h):
-                    is_inside = True
-                    break
-            # appending the bounding box to the list if it is not inside another bounding box
-            if not is_inside:
-                bounding_boxes.append(cv2.boundingRect(contour))
+
+    # retrieving the connected components
+    components = component_labelling(mask)
+
+    # iterating over all the connected components
+    for label, component in components.items():
+        contours, _ = cv2.findContours(
+            component, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+        # sorting the contours based on their size, largest to smallest
+        contours = sorted(contours, key=lambda ctr: cv2.contourArea(ctr))[::-1]
+
+        # creating a bounding box for the largest connected component
+        x, y, w, h = cv2.boundingRect(contours[0])
+        bounding_box = (x, y, w, h)
+        # appending the bounding box to the list
+        bounding_boxes.append(bounding_box)
     return bounding_boxes
 
 
@@ -129,36 +111,17 @@ def single_object_polygon_approximation(mask, epsilon, do_cvt):
 
 
 def multiple_objects_polygon_approximation(mask, epsilon, do_cvt):
-    # Image Cleaning
-    if do_cvt:
-        # transforming image into a binary image
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        # thresholding the image
-        _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
-
-    # increasing standard deviation to blur more (repairing the mask)
-    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
-
-    # applying dilation (optional) and erosion to the mask
-    kernel = np.ones((3, 3), np.uint8)
-    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
-    eroded_mask = cv2.erode(mask, kernel, iterations=1)
-
-    # splitting the different objects in the mask
-    num_labels, labels_im, _, _ = cv2.connectedComponentsWithStats(
-        eroded_mask, connectivity=8)
-
+    # retrieving the connected components
+    _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
+    components = component_labelling(mask)
     # Polygon approximation
     object_contours = {}
 
     # iterating over all the labels from 1 to num_labels (inclusive)
-    for target_label in range(1, num_labels + 1):
-        # creating a binary mask containing only the pixels belonging to the selected connected component
-        target_mask = np.uint8(labels_im == target_label) * 255
-
+    for target_label, component in components.items():
         # retrieving the contours of the selected connected component
         contours, _ = cv2.findContours(
-            target_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            component, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         # looping through the contours
         for contour in contours:
@@ -229,38 +192,17 @@ def single_object_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
 
 
 def multiple_objects_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
-    # Image Cleaning
-    # transforming image into a binary image
-    if do_cvt:
-        # transforming image into a binary image
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        # thresholding the image
-        _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
-
-    # increasing standard deviation to blur more (repairing the mask)
-    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
-
-    # applying dilation (optional) and erosion to the mask
-    kernel = np.ones((3, 3), np.uint8)
-    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
-    eroded_mask = cv2.erode(mask, kernel, iterations=1)
-
-    # splitting the different objects in the mask
-    num_labels, labels_im, _, _ = cv2.connectedComponentsWithStats(
-        eroded_mask, connectivity=8)
-
+    # retrieving the connected components
+    components = component_labelling(mask)
     # K-means clustering
     # initializing a dictionary to store the contours for each connected component
     annotations = {}
 
     # iterating over all the labels from 1 to num_labels (inclusive)
-    for target_label in range(1, num_labels + 1):
-        # creating a binary mask containing only the pixels belonging to the selected connected component
-        target_mask = np.uint8(labels_im == target_label) * 255
-
+    for label, component in components.items():
         # retrieving the contours of the selected connected component
         contours, _ = cv2.findContours(
-            target_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            component, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         # checking if the list of contours is empty
         if not contours:
@@ -289,6 +231,56 @@ def multiple_objects_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
         convex_hull = cv2.convexHull(all_cluster_centers)
 
         # storing the contours in the dictionary with the label as the key
-        annotations[target_label] = [convex_hull]
+        annotations[label] = [convex_hull]
 
     return annotations
+
+
+def component_labelling(image, min_pixel_threshold=100):
+    # checking if the input image is colored (3 channels) or binary (1 channel)
+    if image.ndim == 3 and image.shape[-1] == 3:  # colored mask
+        # converting the colored mask to HSV color space
+        hsv_mask = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+        # retrieving the unique colors present in the image (excluding black and white)
+        unique_colors, color_counts = np.unique(
+            hsv_mask.reshape(-1, hsv_mask.shape[2]), axis=0, return_counts=True)
+
+        # creating a mask for the background color
+        background_mask = np.zeros(hsv_mask.shape[:2], dtype=np.uint8)
+        background_mask[color_counts.argmin()] = 255
+
+        # creating a dictionary to store the masks for each color
+        components = {}
+
+        # defining a mask for each color and find contours for each mask
+        for label, color in enumerate(unique_colors):
+            # checking if the number of pixels for this color is greater than the threshold and not the background
+            if color_counts[label] > min_pixel_threshold and not np.all(color == hsv_mask[background_mask == 255][0]):
+                # Dynamic object identification using color-based segmentation
+                lower_color = np.array(
+                    [color[0] - 10, max(0, color[1] - 40), max(0, color[2] - 40)])
+                upper_color = np.array(
+                    [color[0] + 10, min(255, color[1] + 40), min(255, color[2] + 40)])
+
+                # creating a mask for the selected color
+                color_mask = cv2.inRange(hsv_mask, lower_color, upper_color)
+                components[label] = color_mask
+
+    else:  # binary mask
+        # finding contours in the binary image
+        _, contours, _ = cv2.findContours(
+            image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # creating a dictionary to store the masks for each contour
+        components = {}
+        # looping through all the contours
+        for label, contour in enumerate(contours):
+            # creating a mask for the selected contour
+            mask = np.zeros(image.shape, dtype=np.uint8)
+            cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
+            # adding the mask to the dictionary
+            components[label] = mask[:, :, 0]
+
+    # Returning the dictionary of masks
+    return components
