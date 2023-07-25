@@ -79,7 +79,8 @@ def save(im_dict):
     labels_file_path = os.path.join(
         "./"+im_dict['directory']+"/"+im_dict['file_name'], 'labels.txt')
     with open(labels_file_path, 'w') as f:
-        f.write(im_dict['category'])
+        for count in range(len(im_dict['contours'])):
+            f.write(im_dict['category']+" "+str(count)+"\n")
         f.close()
 
 
