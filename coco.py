@@ -23,9 +23,9 @@ def mask_to_annotation(mask, epsilon, configuration, object_configuration, do_cv
     elif configuration == POLY_APPROX and object_configuration == MULTIPLE_OBJ:
         return ah.multiple_objects_polygon_approximation(mask, epsilon, do_cvt)
     elif configuration == K_MEANS_CLUSTER and object_configuration == SINGLE_OBJ:
-        return ah.single_object_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
+        return ah.single_object_k_means_clustering(mask, max_clusters=100, do_cvt=do_cvt)
     elif configuration == K_MEANS_CLUSTER and object_configuration == MULTIPLE_OBJ:
-        return ah.multiple_objects_k_means_clustering(mask, epsilon, max_clusters=100, do_cvt=do_cvt)
+        return ah.multiple_objects_k_means_clustering(mask, max_clusters=100, do_cvt=do_cvt)
     else:
         pass
 

@@ -58,7 +58,7 @@ def multiple_objects_bounding_box(mask, do_cvt):
     kernel = np.ones((3, 3), np.uint8)
     # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
     eroded_mask = cv2.erode(mask, kernel, iterations=1)
-    
+
     # list   to store the bounding boxes
     bounding_boxes = []
 
@@ -190,7 +190,7 @@ def single_object_k_means_clustering(mask, max_clusters, do_cvt):
 
     # using the elbow method to find the optimal number of clusters
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
-    
+
     '''
     cv2.kmeans
     ----------
@@ -226,14 +226,6 @@ def single_object_k_means_clustering(mask, max_clusters, do_cvt):
 
 
 def multiple_objects_k_means_clustering(mask, max_clusters, do_cvt):
-    # increasing standard deviation to blur more (repairing the mask)
-    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
-
-    # applying dilation (optional) and erosion to the mask
-    kernel = np.ones((3, 3), np.uint8)
-    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
-    eroded_mask = cv2.erode(mask, kernel, iterations=1)
-
     # retrieving the connected components
     components = component_labelling(mask)
     # K-means clustering
