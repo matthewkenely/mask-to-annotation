@@ -51,6 +51,14 @@ def single_object_bounding_box(mask, do_cvt):
 
 
 def multiple_objects_bounding_box(mask, do_cvt):
+    # increasing standard deviation to blur more (repairing the mask)
+    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
+
+    # applying dilation (optional) and erosion to the mask
+    kernel = np.ones((3, 3), np.uint8)
+    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+    eroded_mask = cv2.erode(mask, kernel, iterations=1)
+    
     # list   to store the bounding boxes
     bounding_boxes = []
 
@@ -111,6 +119,14 @@ def single_object_polygon_approximation(mask, epsilon, do_cvt):
 
 
 def multiple_objects_polygon_approximation(mask, epsilon, do_cvt):
+    # increasing standard deviation to blur more (repairing the mask)
+    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
+
+    # applying dilation (optional) and erosion to the mask
+    kernel = np.ones((3, 3), np.uint8)
+    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+    eroded_mask = cv2.erode(mask, kernel, iterations=1)
+
     # retrieving the connected components
     _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
     components = component_labelling(mask)
@@ -140,7 +156,7 @@ def multiple_objects_polygon_approximation(mask, epsilon, do_cvt):
     return object_contours
 
 
-def single_object_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
+def single_object_k_means_clustering(mask, max_clusters, do_cvt):
     # transforming image into a binary image
     if do_cvt:
         # transforming image into a binary image
@@ -174,6 +190,24 @@ def single_object_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
 
     # using the elbow method to find the optimal number of clusters
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+    
+    '''
+    cv2.kmeans
+    ----------
+    flattened_points :: samples
+    max_clusters :: max_clusters
+    bestLabels :: None
+    criteria ::
+        TERM_CRITERIA_EPS -> stop the algorithm iteration if specified accuracy, epsilon, is reached
+        0.2 -> epsilon
+
+        TERM_CRITERIA_MAX_ITER -> stop the algorithm after the specified number of iterations, max_iter
+        100 -> max_iter 
+    
+    attempts :: 10 (using different initial labellings)
+    flags :: KMEANS_RANDOM_CENTERS -> select random initial centers in each attempt
+    '''
+
     _, labels, centers = cv2.kmeans(
         flattened_points, max_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
@@ -191,7 +225,15 @@ def single_object_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
     return annotations
 
 
-def multiple_objects_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
+def multiple_objects_k_means_clustering(mask, max_clusters, do_cvt):
+    # increasing standard deviation to blur more (repairing the mask)
+    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
+
+    # applying dilation (optional) and erosion to the mask
+    kernel = np.ones((3, 3), np.uint8)
+    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+    eroded_mask = cv2.erode(mask, kernel, iterations=1)
+
     # retrieving the connected components
     components = component_labelling(mask)
     # K-means clustering
@@ -219,6 +261,7 @@ def multiple_objects_k_means_clustering(mask, epsilon, max_clusters, do_cvt):
         # using the elbow method to find the optimal number of clusters
         criteria = (cv2.TERM_CRITERIA_EPS +
                     cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+
         _, labels, centers = cv2.kmeans(
             flattened_points, max_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
