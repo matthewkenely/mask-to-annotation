@@ -51,19 +51,11 @@ def single_object_bounding_box(mask, do_cvt):
 
 
 def multiple_objects_bounding_box(mask, do_cvt):
-    # increasing standard deviation to blur more (repairing the mask)
-    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
-
-    # applying dilation (optional) and erosion to the mask
-    kernel = np.ones((3, 3), np.uint8)
-    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
-    eroded_mask = cv2.erode(mask, kernel, iterations=1)
-
-    # list   to store the bounding boxes
-    bounding_boxes = []
-
     # retrieving the connected components
     components = component_labelling(mask)
+
+    # list to store the bounding boxes
+    bounding_boxes = []
 
     # iterating over all the connected components
     for label, component in components.items():
@@ -119,16 +111,7 @@ def single_object_polygon_approximation(mask, epsilon, do_cvt):
 
 
 def multiple_objects_polygon_approximation(mask, epsilon, do_cvt):
-    # increasing standard deviation to blur more (repairing the mask)
-    mask = cv2.GaussianBlur(mask, (7, 7), sigmaX=1, sigmaY=1)
-
-    # applying dilation (optional) and erosion to the mask
-    kernel = np.ones((3, 3), np.uint8)
-    # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
-    eroded_mask = cv2.erode(mask, kernel, iterations=1)
-
     # retrieving the connected components
-    _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
     components = component_labelling(mask)
     # Polygon approximation
     object_contours = {}
@@ -271,7 +254,8 @@ def multiple_objects_k_means_clustering(mask, max_clusters, do_cvt):
     return annotations
 
 
-def component_labelling(image, min_pixel_threshold=100):
+def component_labelling(image, dynamic_threshold_factor=0.0003):
+    # dynamic threshold factor is used to calculate the dynamic threshold
     # checking if the input image is colored (3 channels) or binary (1 channel)
     if image.ndim == 3 and image.shape[-1] == 3:  # colored mask
         # converting the colored mask to HSV color space
@@ -284,6 +268,10 @@ def component_labelling(image, min_pixel_threshold=100):
         # creating a mask for the background color
         background_mask = np.zeros(hsv_mask.shape[:2], dtype=np.uint8)
         background_mask[color_counts.argmin()] = 255
+
+        # calculating the dynamic threshold based on the total number of pixels in the image
+        min_pixel_threshold = int(
+            dynamic_threshold_factor * np.prod(hsv_mask.shape[:2]))
 
         # creating a dictionary to store the masks for each color
         components = {}
@@ -301,7 +289,6 @@ def component_labelling(image, min_pixel_threshold=100):
                 # creating a mask for the selected color
                 color_mask = cv2.inRange(hsv_mask, lower_color, upper_color)
                 components[label] = color_mask
-
     else:  # binary mask
         # finding contours in the binary image
         _, contours, _ = cv2.findContours(
