@@ -37,11 +37,36 @@ def display(im_dict, annotation_color, object_configuration):
         cv2.drawContours(annotated_image, im_dict['contours'], -1,
                          annotation_color, 7, cv2.LINE_AA)
     else:
+        # setting the transparency of the filled bounding box
+        alpha = 0.25
+        # sorting contours by area
+        for label, contours_list in im_dict['contours'].items():
+            im_dict['contours'][label] = sorted(
+                contours_list, key=lambda x: cv2.contourArea(x))
         # drawing each contour on the blank image with the specified annotation_color
         for label, contours in im_dict['contours'].items():
+            # creating a blank image
+            blank_image = np.zeros_like(im_dict['image'])
+            # getting the annotation color
+            annotation_color = ah.multiple_object_annotation_color(
+                annotation_color=annotation_color)
             for contour in contours:
-                cv2.drawContours(annotated_image, [contour], -1,
-                                 annotation_color, 7, cv2.LINE_AA)
+                # drawing the contour on the blank image
+                contour_image = cv2.drawContours(blank_image, [contour], -1,
+                                                 annotation_color, 7, cv2.LINE_AA)
+                # adding the contour image to the annotated image
+                contours_image = cv2.drawContours(annotated_image.copy(), [contour], -1,
+                                                  annotation_color, 7, cv2.LINE_AA)
+                # adding filled contour to the annotated image
+                filled_contour_image = cv2.drawContours(contours_image.copy(), [contour], -1,
+                                                        annotation_color, cv2.FILLED, cv2.LINE_AA)
+                # adding the contour image to the annotated image
+                annotated_image = cv2.addWeighted(annotated_image,
+                                                  1-alpha, filled_contour_image, alpha, 0)
+
+                # adding the contours to the annotated image
+                annotated_image = cv2.drawContours(annotated_image, [contour], -1,
+                                                   annotation_color, 7, cv2.LINE_AA)
 
     # displaying original mask on the left and annotation on the right
     plt.rcParams["figure.figsize"] = (20, 10)

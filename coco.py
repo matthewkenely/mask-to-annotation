@@ -37,11 +37,36 @@ def display(im_dict, annotation_color, object_configuration):
         cv2.drawContours(annotated_image, im_dict['contours'], -1,
                          annotation_color, 7, cv2.LINE_AA)
     else:
+        # setting the transparency of the filled bounding box
+        alpha = 0.25
+        # sorting contours by area
+        for label, contours_list in im_dict['contours'].items():
+            im_dict['contours'][label] = sorted(
+                contours_list, key=lambda x: cv2.contourArea(x))
         # drawing each contour on the blank image with the specified annotation_color
         for label, contours in im_dict['contours'].items():
+            # creating a blank image
+            blank_image = np.zeros_like(im_dict['image'])
+            # getting the annotation color
+            annotation_color = ah.multiple_object_annotation_color(
+                annotation_color=annotation_color)
             for contour in contours:
-                cv2.drawContours(annotated_image, [contour], -1,
-                                 annotation_color, 7, cv2.LINE_AA)
+                # drawing the contour on the blank image
+                contour_image = cv2.drawContours(blank_image, [contour], -1,
+                                                 annotation_color, 7, cv2.LINE_AA)
+                # adding the contour image to the annotated image
+                contours_image = cv2.drawContours(annotated_image.copy(), [contour], -1,
+                                                  annotation_color, 7, cv2.LINE_AA)
+                # adding filled contour to the annotated image
+                filled_contour_image = cv2.drawContours(contours_image.copy(), [contour], -1,
+                                                        annotation_color, cv2.FILLED, cv2.LINE_AA)
+                # adding the contour image to the annotated image
+                annotated_image = cv2.addWeighted(annotated_image,
+                                                  1-alpha, filled_contour_image, alpha, 0)
+
+                # adding the contours to the annotated image
+                annotated_image = cv2.drawContours(annotated_image, [contour], -1,
+                                                   annotation_color, 7, cv2.LINE_AA)
 
     # displaying original mask on the left and annotation on the right
     plt.rcParams["figure.figsize"] = (20, 10)
@@ -75,15 +100,17 @@ def save(im_dict, object_configuration):
             }
         ],
         'annotations': [],
-        'categories': [
-            {
-                'id': im_dict['id'],
-                'name': im_dict['category']
-            }
-        ]
+        'categories': []
     }
 
     if (object_configuration == SINGLE_OBJ):
+        # adding the category to the dictionary
+        coco_data['categories'].append(
+            {
+                'id': im_dict['id'],
+                'name': im_dict['category']
+            })
+
         # looping through the contours and adding them to the dictionary
         for contour in im_dict['contours']:
             contour = np.array(contour, dtype=np.float32)
@@ -103,8 +130,14 @@ def save(im_dict, object_configuration):
                 'area': cv2.contourArea(contour)
             })
     else:
+        counter = 0
         # Looping through the contours and adding them to the dictionary
         for label, contours_list in im_dict['contours'].items():
+            # retrieving the category id and label
+            category_id = counter
+            category_label = im_dict['category']+str(category_id)
+
+            # looping through the contours
             for contour in contours_list:
                 contour = np.array(contour, dtype=np.float32)
 
@@ -114,14 +147,22 @@ def save(im_dict, object_configuration):
 
                 # Adding the contour to the dictionary
                 coco_data['annotations'].append({
-                    'id': len(coco_data['annotations']) + 1,
+                    'id': counter,
                     'iscrowd': 0,
                     'image_id': im_dict['id'],
-                    'category_id': im_dict['id'],
+                    'category_id': category_id,
                     'segmentation': [contour.flatten().tolist()],
                     'bbox': cv2.boundingRect(contour),
                     'area': cv2.contourArea(contour)
                 })
+
+            # adding the category to the dictionary
+            coco_data['categories'].append(
+                {
+                    'id': category_id,
+                    'name': category_label
+                })
+            counter += 1
 
     # creating a directory to store the annotations
     if not os.path.exists(im_dict['directory']):
