@@ -1,6 +1,8 @@
+import colorsys
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 # Constants
 # Noise Threshold
@@ -288,21 +290,70 @@ def component_labelling(image, dynamic_threshold_factor=0.0003):
 
                 # creating a mask for the selected color
                 color_mask = cv2.inRange(hsv_mask, lower_color, upper_color)
-                components[label] = color_mask
+
+                # increasing standard deviation to blur more (repairing the mask)
+                blurred_mask = cv2.GaussianBlur(
+                    color_mask, (7, 7), sigmaX=1, sigmaY=1)
+
+                # applying dilation (optional) and erosion to the mask
+                kernel = np.ones((3, 3), np.uint8)
+                # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+                eroded_mask = cv2.erode(blurred_mask, kernel, iterations=1)
+
+                components[label] = eroded_mask
     else:  # binary mask
-        # finding contours in the binary image
-        _, contours, _ = cv2.findContours(
-            image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        # creating a dictionary to store the masks for each contour
         components = {}
-        # looping through all the contours
-        for label, contour in enumerate(contours):
-            # creating a mask for the selected contour
-            mask = np.zeros(image.shape, dtype=np.uint8)
-            cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
-            # adding the mask to the dictionary
-            components[label] = mask[:, :, 0]
 
+        # finding the components in the binary image
+        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(
+            image, connectivity=8)
+
+        for label in range(1, num_labels):
+            # creating a mask for the selected component
+            component_mask = np.zeros(image.shape, dtype=np.uint8)
+            component_mask[labels == label] = 255
+
+            binary_mask = component_mask[:, :, 0]
+            # increasing standard deviation to blur more (repairing the mask)
+            blurred_mask = cv2.GaussianBlur(
+                binary_mask, (7, 7), sigmaX=1, sigmaY=1)
+
+            # applying dilation (optional) and erosion to the mask
+            kernel = np.ones((3, 3), np.uint8)
+            # dilated_mask = cv2.dilate(mask, dilation_kernel, iterations=1)
+            eroded_mask = cv2.erode(blurred_mask, kernel, iterations=1)
+
+            components[label] = eroded_mask
+
+    print('\033[94m', "\n Number of objects detected: ",
+          len(components), '\033[0m')
     # Returning the dictionary of masks
     return components
+
+
+def multiple_object_annotation_color(annotation_color, threshold=0.3):
+    # extracting color channels
+    red, green, blue = annotation_color
+
+    # Using passed color:
+    # generating a random color
+    # random_red = random.uniform(-threshold * 255, threshold * 255)
+    # random_green = random.uniform(-threshold * 255, threshold * 255)
+    # random_blue = random.uniform(-threshold * 255, threshold * 255)
+
+    # adding the random color to the annotation color
+    # new_red = max(0, min(255, red + random_red))
+    # new_green = max(0, min(255, green + random_green))
+    # new_blue = max(0, min(255, blue + random_blue))
+    # return (new_red, new_green, new_blue)
+
+    # Using random bright colors:
+    # generating a random color
+    hue = random.uniform(0, 360)
+
+    # converting the HSV color to RGB
+    hsv_color = (hue / 360, 1, 1)
+    random_rgb = tuple(int(i * 255) for i in colorsys.hsv_to_rgb(*hsv_color))
+
+    # returning the new color
+    return random_rgb

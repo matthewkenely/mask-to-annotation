@@ -22,13 +22,36 @@ def mask_to_annotation(mask, object_configuration, do_cvt):
         pass
 
 
-def display(im_dict, annotation_color):
+def display(im_dict, annotation_color, object_configuration):
     # displaying bounding boxes on the image
     image_with_bounding_box = im_dict['image'].copy()
-    for contour in im_dict['contours']:
-        x, y, w, h = contour
-        cv2.rectangle(image_with_bounding_box, (x, y),
-                      (x+w, y+h), annotation_color, 7)
+    if (object_configuration == SINGLE_OBJ):
+        for contour in im_dict['contours']:
+            x, y, w, h = contour
+            cv2.rectangle(image_with_bounding_box, (x, y),
+                          (x+w, y+h), annotation_color, 7)
+    else:
+        # setting the transparency of the filled bounding box
+        alpha = 0.25
+        # creating a blank image
+        blank_image = np.zeros_like(im_dict['image'])
+        # sorting contours by area
+        im_dict['contours'] = sorted(
+            im_dict['contours'], key=lambda rect: rect[2] * rect[3])
+        # drawing each contour on the blank image with the specified annotation_color
+        for contour in im_dict['contours']:
+            annotation_color = ah.multiple_object_annotation_color(
+                annotation_color=annotation_color)
+            x, y, w, h = contour
+            # drawing the filled bounding box on the blank image
+            filled_image = cv2.rectangle(blank_image, (x, y),
+                                         (x+w, y+h), annotation_color, cv2.FILLED)
+            # adding the filled bounding box to the image with bounding boxes
+            image_with_bounding_box = cv2.addWeighted(image_with_bounding_box,
+                                                      1-alpha, filled_image, alpha, 0)
+            # drawing the bounding box on the image with bounding boxes
+            image_with_bounding_box = cv2.rectangle(image_with_bounding_box, (x, y),
+                                                    (x+w, y+h), annotation_color, 7)
 
     # displaying original mask on the left and annotation on the right
     plt.rcParams["figure.figsize"] = (20, 10)
@@ -101,7 +124,7 @@ def annotate(im, do_display=True, do_save=True, annotation_color=(0, 255, 0), ob
 
     # displaying and saving the image, depending on the passed parameters
     if do_display:
-        display(im_dict, annotation_color)
+        display(im_dict, annotation_color, object_configuration)
 
     if do_save:
         save(im_dict)
