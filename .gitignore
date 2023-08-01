@@ -1,0 +1,17 @@
+COTSDataset
+output
+settings.json
+__pycache__
+.ipynb_checkpoints
+.vscode
+COCO_annotations
+YOLO_annotations
+VGG_annotations
+Sam_checkpoints
+sam_vit_h_4b8939.pth
+Evaluation/*.json
+COCO_annotations_multiple
+YOLO_annotations_multiple
+VGG_annotations_multiple
+Evaluation/COCO
+Evaluation/Figures
