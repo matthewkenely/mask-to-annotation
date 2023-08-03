@@ -301,6 +301,9 @@ def component_labelling(image, dynamic_threshold_factor=0.0003):
                 eroded_mask = cv2.erode(blurred_mask, kernel, iterations=1)
 
                 components[label] = eroded_mask
+
+                # plt.imshow(eroded_mask, cmap='gray')
+                # plt.show()
     else:  # binary mask
         components = {}
 
