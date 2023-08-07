@@ -14,6 +14,5 @@ COCO_annotations_multiple
 YOLO_annotations_multiple
 VGG_annotations_multiple
 Evaluation/COCO
-Evaluation/Figures
 Evaluation/*.png
 Evaluation/*.jpeg
