@@ -11,6 +11,7 @@ By leveraging contour detection algorithms and image processing techniques, our 
 **<h2 name="coco-annotations">Table of Contents</h2>**
 
 - **[Examples](#examples)**
+  - [Visual Annotations](#visual-annotations)
   - [COCO Annotations](#coco-annotations)
   - [YOLO Annotations](#yolo-annotations)
   - [VGG Annotations](#vgg-annotations)
@@ -21,13 +22,20 @@ By leveraging contour detection algorithms and image processing techniques, our 
 
 **<h1 name="examples">Examples</h1>**
 
-**<h2 name="coco-annotations">COCO Annotations</h2>**
+**<h2 name="visual-annotations">Visual Annotations</h2>**
 <!-- Show images -->
-<h3>Images</h3>
-<p align="center"><img src='./Assets/coco_annotation_1.png'></p>
-<p align="center"><img src='./Assets/coco_original_1.png'></p>
+<h3>Sample Images</h3>
+
+<p align="center"><img src='./Evaluation/Figures/Original vs Mask Multiple.png'></p>
 
 
+<h3>Polygon Annotation</h3>
+<p align="center"><img src='./Evaluation/Figures/COCO_VGG_Results_Multiple.png'></p>
+
+<h3>Bounding Box Annotation</h3>
+<p align="center"><img src='./Evaluation/Figures/YOLO_Results_Multiple.png'></p>
+
+**<h2 name="coco-annotations">COCO Annotations</h2>**
 <!-- Show json output -->
 <h3>Annotation (JSON)</h3>
 
@@ -72,13 +80,7 @@ By leveraging contour detection algorithms and image processing techniques, our 
 
 <hr>
 
-**<h2 name="yolo-annotations">YOLOv4 Annotations</h2>**
-<!-- Show images -->
-<h3>Images</h3>
-<p align="center"><img src='./Assets/yolo_annotation_1.png'></p>
-<p align="center"><img src='./Assets/yolo_original_1.png'></p>
-
-
+**<h2 name="yolo-annotations">YOLO Annotations</h2>**
 <!-- Show txt output -->
 <h3>Annotation (TXT)</h3>
 
@@ -93,11 +95,6 @@ souvenirs_oc
 <hr>
 
 **<h2 name="vgg-annotations">VGG Annotations</h2>**
-<!-- Show images -->
-<h3>Images</h3>
-<p align="center"><img src='./Assets/vgg_annotation_1.png'></p>
-<p align="center"><img src='./Assets/vgg_original_1.png'></p>
-
 <!-- Show json output -->
 <h3>Annotation (JSON)</h3>
 
