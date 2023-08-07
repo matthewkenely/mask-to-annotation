@@ -11,7 +11,8 @@ By leveraging contour detection algorithms and image processing techniques, our 
 **<h2 name="coco-annotations">Table of Contents</h2>**
 
 - **[Examples](#examples)**
-  - [Visual Annotations](#visual-annotations)
+  - [Single Objects](#single-objects)
+  - [Multiple Objects](#multiple-objects)
   - [COCO Annotations](#coco-annotations)
   - [YOLO Annotations](#yolo-annotations)
   - [VGG Annotations](#vgg-annotations)
@@ -22,18 +23,30 @@ By leveraging contour detection algorithms and image processing techniques, our 
 
 **<h1 name="examples">Examples</h1>**
 
-**<h2 name="visual-annotations">Visual Annotations</h2>**
+**<h2 name="single-objects">Single Objects</h2>**
+<!-- Show images -->
+<h3>Sample Images</h3>
+
+<p align="center"><img src='./Evaluation/Figures/Original vs Mask.png'></p>
+
+<h3>Polygon Annotation</h3>
+<p align="center"><img src='./Evaluation/Figures/COCO_VGG_Results.png'></p>
+
+<h3>Bounding Box Annotation</h3>
+<p align="center"><img src='./Evaluation/Figures/YOLO_Results.png'></p>
+
+**<h2 name="multiple-objects">Multiple Objects</h2>**
 <!-- Show images -->
 <h3>Sample Images</h3>
 
 <p align="center"><img src='./Evaluation/Figures/Original vs Mask Multiple.png'></p>
-
 
 <h3>Polygon Annotation</h3>
 <p align="center"><img src='./Evaluation/Figures/COCO_VGG_Results_Multiple.png'></p>
 
 <h3>Bounding Box Annotation</h3>
 <p align="center"><img src='./Evaluation/Figures/YOLO_Results_Multiple.png'></p>
+
 
 **<h2 name="coco-annotations">COCO Annotations</h2>**
 <!-- Show json output -->
