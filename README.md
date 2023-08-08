@@ -19,9 +19,9 @@ By leveraging contour detection algorithms and image processing techniques, our 
   - [VGG Annotations](#vgg-annotations)
 - **[Documentation](#documentation)**
   - [Installation Details](#installation-details)
-  - [COCO Annotation Method](#coco-annotation-method)
-  - [YOLO Annotation Method](#yolo-annotation-method)
-  - [VGG Annotation Method](#vgg-annotation-method)
+  - [COCO Annotation Function](#coco-annotation-function)
+  - [YOLO Annotation Function](#yolo-annotation-function)
+  - [VGG Annotation Function](#vgg-annotation-function)
 
 <hr>
 
@@ -160,10 +160,10 @@ To perform the annotations, you must also install the following python files fro
 - `yolo.py`
 - `annotation_helper.py`
 
-**<h2 name="coco-annotation-method">COCO Annotation method</h2>**
+**<h2 name="coco-annotation-function">COCO Annotation Function</h2>**
 
 To generate COCO annotations, use the `coco.py` module.
-For ease-of-use, the following method was created to generate COCO annotations from the inputted mask image:
+For ease-of-use, the following function was created to generate COCO annotations from the inputted mask image:
 <details>
 <summary  style="color: lightblue;"><b> coco.annotate(**params)</b></summary>
 
@@ -181,10 +181,10 @@ For ease-of-use, the following method was created to generate COCO annotations f
 - `do_cvt` : A boolean value indicating whether or not to convert the image to RGB.
 </details>
 
-**<h2 name="yolo-annotation-method">YOLO Annotation method</h2>**
+**<h2 name="yolo-annotation-function">YOLO Annotation Function</h2>**
 
 To generate YOLO annotations, use the `yolo.py` module.
-For ease-of-use, the following method was created to generate YOLO annotations from the inputted mask image:
+For ease-of-use, the following function was created to generate YOLO annotations from the inputted mask image:
 <details>
 <summary  style="color: lightblue;"><b> yolo.annotate(**params)</b></summary>
 
@@ -198,10 +198,10 @@ For ease-of-use, the following method was created to generate YOLO annotations f
 - `do_cvt` : A boolean value indicating whether or not to convert the image to RGB.
 </details>
 
-**<h2 name="vgg-annotation-method">VGG Annotation method</h2>**
+**<h2 name="vgg-annotation-function">VGG Annotation Function</h2>**
 
 To generate VGG annotations, use the `vgg.py` module.
-For ease-of-use, the following method was created to generate VGG annotations from the inputted mask image:
+For ease-of-use, the following function was created to generate VGG annotations from the inputted mask image:
 <details>
 <summary  style="color: lightblue;"><b> vgg.annotate(**params)</b></summary>
 
