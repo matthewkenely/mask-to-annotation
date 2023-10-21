@@ -160,6 +160,22 @@ To perform the annotations, you must also install the following python files fro
 - `yolo.py`
 - `annotation_helper.py`
 
+
+Kindly note that in case any problems arise, one can easily clone the environment used for this project using the `environment.yml` file in the environment folder. Additionally, the `requirements.txt` file in the environment folder contains all the dependencies used in this project.
+
+To install the environment, run the following command:
+```python
+cd Environment
+conda env create -f environment.yml
+conda activate mask-to-annotation
+```
+
+To install the dependencies, run the following command:
+```python
+cd Environment
+pip install -r requirements.txt
+```
+
 **<h2 name="coco-annotation-function">COCO Annotation Function</h2>**
 
 To generate COCO annotations, use the `coco.py` module.
