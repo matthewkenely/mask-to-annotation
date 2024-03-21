@@ -22,6 +22,7 @@ By leveraging contour detection algorithms and image processing techniques, our 
   - [COCO Annotation Function](#coco-annotation-function)
   - [YOLO Annotation Function](#yolo-annotation-function)
   - [VGG Annotation Function](#vgg-annotation-function)
+- **[Citation](#citation)**
 
 <hr>
 
@@ -235,3 +236,22 @@ For ease-of-use, the following function was created to generate VGG annotations 
 - `do_cvt` : A boolean value indicating whether or not to convert the image to RGB.
 </details>
 
+**<h1 name="citation">Citation</h1>**
+
+To cite this paper, kindly use the following citation:
+
+```bib
+@INPROCEEDINGS{10473513,
+  author={Seychell, Dylan and Kenely, Matthew and Bartolo, Matthias and Debono, Carl James and Bugeja, Mark and Sacco, Matthew},
+  booktitle={2023 IEEE International Symposium on Multimedia (ISM)}, 
+  title={Efficient Automatic Annotation of Binary Masks for Enhanced Training of Computer Vision Models}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={256-259},
+  keywords={Training;YOLO;Computer vision;Annotations;Computational modeling;Clustering algorithms;Training data;Computer Vision;Data Annotation;Datasets},
+  doi={10.1109/ISM59092.2023.00049}}
+
+```
+
+The paper associated with mask-to-annotation is available for free as an open-access paper on IEEE: https://ieeexplore.ieee.org/document/10473513
