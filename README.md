@@ -254,4 +254,4 @@ To cite this paper, kindly use the following citation:
 
 ```
 
-The paper associated with mask-to-annotation is available for free as an open-access paper on IEEE: https://ieeexplore.ieee.org/document/10473513
+The paper associated with mask-to-annotation is available on IEEE Xplore: https://ieeexplore.ieee.org/document/10473513
