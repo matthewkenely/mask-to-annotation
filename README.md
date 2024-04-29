@@ -241,17 +241,15 @@ For ease-of-use, the following function was created to generate VGG annotations 
 To cite this paper, kindly use the following citation:
 
 ```bib
-@INPROCEEDINGS{10473513,
+@inproceedings{seychell2023efficient,
+  title={Efficient Automatic Annotation of Binary Masks for Enhanced Training of Computer Vision Models},
   author={Seychell, Dylan and Kenely, Matthew and Bartolo, Matthias and Debono, Carl James and Bugeja, Mark and Sacco, Matthew},
-  booktitle={2023 IEEE International Symposium on Multimedia (ISM)}, 
-  title={Efficient Automatic Annotation of Binary Masks for Enhanced Training of Computer Vision Models}, 
+  booktitle={2023 IEEE International Symposium on Multimedia (ISM)},
+  pages={256--259},
   year={2023},
-  volume={},
-  number={},
-  pages={256-259},
+  organization={IEEE},
   keywords={Training;YOLO;Computer vision;Annotations;Computational modeling;Clustering algorithms;Training data;Computer Vision;Data Annotation;Datasets},
   doi={10.1109/ISM59092.2023.00049}}
-
 ```
 
 The paper associated with mask-to-annotation is available on IEEE Xplore: https://ieeexplore.ieee.org/document/10473513
